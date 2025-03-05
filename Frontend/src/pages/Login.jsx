@@ -87,20 +87,29 @@
 // export default Login;
 
 
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import './signup.css';
 import LinearProgress from '@mui/material/LinearProgress';
 import { ContextData } from "../Context";
+import { useLazyUserLogoutQuery } from "../app/userApiSlice";
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
   const { userData, setUserData } = useContext(ContextData);
   const navigate = useNavigate();
+  const [fun, { data: data1, isError: isError1, isLoading: isLoading1, error: error1 }] = useLazyUserLogoutQuery();
+
+  useEffect(() => {
+    const clearUserDetais = async() => {
+      await fun()
+    }
+
+    clearUserDetais()
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault();

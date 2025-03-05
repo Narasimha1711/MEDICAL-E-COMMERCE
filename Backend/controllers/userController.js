@@ -3,6 +3,9 @@ const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const secret = process.env.JWT_SECRET;
+
+
+
 const userLogin = async (req, res) => {
   const { email, password } = req.body;
   // console.log(req.body)
@@ -26,7 +29,7 @@ const userLogin = async (req, res) => {
           httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
           secure: false, // Set to true in production if using HTTPS
           sameSite: "Lax", // Helps with CSRF protection
-          maxAge: 5 * 60 * 1000, // 1 hour expiration
+          maxAge: 20 * 60 * 1000, // 1 hour expiration
         });
         return res
           .status(200)
@@ -70,17 +73,17 @@ const userRegister = async (req, res) => {
 
 const userInfo = async (req, res) => {
   const cookieData = req.cookies.token;
-  // console.log(cookieData)
+  // console.log(cookieData) 
 
   if (!cookieData) {
     return res
       .status(401)
-      .json({ message: "No token provided. Please log in.", path: "/login" });
+      .json({ message: "Invalid JWT", path: "/login" });
   }
 
   jwt.verify(cookieData, secret, {}, async (err, userData) => {
     if (err) {
-      throw err;
+      return res.status(401).json({ message: "Invalid JWT" });
     }
     // console.log(userData);
     const email = userData.email;
@@ -92,5 +95,22 @@ const userInfo = async (req, res) => {
   // res.status(200).json(cookieData)
 };
 
-module.exports = { userLogin, userRegister, userInfo };
+
+const userLogout = async (req, res) => {
+
+
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: false, // Set to true in production if using HTTPS
+    sameSite: "Lax",
+    path: '/',
+  });
+  res.status(200).json({ message: "Logged out successfully" });
+  
+  // console.log(cookieData) 
+
+  // res.status(200).json(cookieData)
+};
+
+module.exports = { userLogin, userRegister, userInfo, userLogout };
 // export { userLogin, userRegister, userInfo }

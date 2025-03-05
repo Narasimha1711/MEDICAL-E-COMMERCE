@@ -7,6 +7,10 @@ import axios from 'axios';
 import NormalHome from '../Components/NormalHome';
 import SearchedItems from '../Components/SearchedItems';
 import { SearchContextCreate } from '../SearchContext';
+import { useSelector } from 'react-redux';
+import NotificationToast from '../Components/NotificationToast';
+// import { useHeQuery, useSearchItemsMutation } from '../app/getProducts';
+
 
 const Home = () => {
     
@@ -14,17 +18,29 @@ const Home = () => {
     // const [search, setSearchItem] = useState('');
     const { searchItems, setSearchItems } = useContext(SearchContextCreate);
     const { searchItem, setSearchItem } = useContext(SearchContextCreate);
+    const searchQuery = useSelector((state) => state.searchQuery.searchQuery)
 
-    useEffect(() => {
 
-        const storedSearchItems = localStorage.getItem('searchItems');
-        if (storedSearchItems !== JSON.stringify(searchItems)) {
-            setSearchItems(JSON.parse(storedSearchItems));
-        }
+    // const [searchItems, { data: products, error, isLoading }] = useSearchItemsMutation();
+    // const add = useSearchItemsMutation();
+    // console.log(add)
+    // const searchQuery = useSelector((state) => state.searchQuery.searchQuery)
+    // searchItems({searchItem: searchQuery})
+
+
+    // const {data, isLoading1} = useHeQuery();
+    // console.log(useHeQuery());
+    // console.log(data);
+    // useEffect(() => {
+
+    //     const storedSearchItems = localStorage.getItem('searchItems');
+    //     if (storedSearchItems !== JSON.stringify(searchItems)) {
+    //         setSearchItems(JSON.parse(storedSearchItems));
+    //     }
 
         
         
-    })
+    // })
     
     // useEffect(() => {
     //     const callAllMedicines = async () => {
@@ -37,18 +53,21 @@ const Home = () => {
         
     //     callAllMedicines();
     // }, [searchItem])
-
+    // console.log(searchQuery)
     
   return (
     <>
 
 
         
-
-        { !searchItems && <NormalHome />}
+        {/* { !searchItems && <NormalHome />} */}
+        { searchQuery === '' && <NormalHome />}
+        { searchQuery !== '' && <SearchedItems />}
         
-        {searchItems && <SearchedItems />}
+        {/* {searchItems && <SearchedItems />} */}
+      
 
+      
         
 
 

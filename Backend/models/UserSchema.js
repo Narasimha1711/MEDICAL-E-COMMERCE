@@ -35,66 +35,90 @@ const UserSchema = new mongoose.Schema({
             type: Number,
             required: true
         },
+        discountedPrice: {
+            type: Number
+        },
+        discount: {
+            type: Number
+        },
         description: {
             type: String,
             required: true
         },
         image: {
             type: String,
+        },
+        count: {
+            type: Number,
+            required: true,
+            default: 1
         }
         // Add other fields as needed
     }],
     booked: [{
-        _id: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: true
-        },
-        name: {
-            type: String,
-            required: true
-        },
-        seller: {
-            type: String,
-            required: true
-        },
-        price: {
-            type: Number,
-            required: true
-        },
-        description: {
-            type: String,
-            required: true
-        },
-        image: {
-            type: String,
-        }
+        // _id: {
+        //     type: mongoose.Schema.Types.ObjectId,
+        //     required: true
+        // },
+        // name: {
+        //     type: String,
+        //     required: true
+        // },
+        // seller: {
+        //     type: String,
+        //     required: true
+        // },
+        // price: {
+        //     type: Number,
+        //     required: true
+        // },
+        // description: {
+        //     type: String,
+        //     required: true
+        // },
+        // image: {
+        //     type: String,
+        // },
+        // count: {
+        //     type: Number,
+        //     required: true
+        // }
         // Add other fields as needed
+        orderId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Order'
+        }
     }],
     received: [{
-        _id: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: true
-        },
-        name: {
-            type: String,
-            required: true
-        },
-        seller: {
-            type: String,
-            required: true
-        },
-        price: {
-            type: Number,
-            required: true
-        },
-        description: {
-            type: String,
-            required: true
-        },
-        image: {
-            type: String,
-        }
+        // _id: {
+        //     type: mongoose.Schema.Types.ObjectId,
+        //     required: true
+        // },
+        // name: {
+        //     type: String,
+        //     required: true
+        // },
+        // seller: {
+        //     type: String,
+        //     required: true
+        // },
+        // price: {
+        //     type: Number,
+        //     required: true
+        // },
+        // description: {
+        //     type: String,
+        //     required: true
+        // },
+        // image: {
+        //     type: String,
+        // }
         // Add other fields as needed
+
+        orderId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Order'
+        }
     }]
 
 }, {

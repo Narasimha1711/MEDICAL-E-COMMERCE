@@ -7,16 +7,21 @@ const MedicineSchema = new mongoose.Schema({
     },
 
     seller: {
-        type : String,
-        required: true,
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
     },
 
     count: {
         type : Number,
-        required: true,
     },
     
     price: {
+        type: Number
+    },
+    discountedPrice: {
+        type: Number
+    },
+    discount: {
         type: Number
     },
     description: {
@@ -28,7 +33,11 @@ const MedicineSchema = new mongoose.Schema({
     },
     category: {
         type: String
-    }
+    },
+    location: {
+        type: Array,
+        required: true
+    },
     
 
 })

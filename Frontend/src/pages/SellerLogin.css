@@ -1,108 +1,182 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
-.img{
-    float: left;
-    width: 400px;
-    height: 580px;
-}
-.img2{
-    float: right;
-    width: 450px;
-    height: 580px;
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f9f9f9;
 }
 
-.wrapper{  
-    background: transparent;
-    
-    color: black;
-    border-radius: 70px;
-    padding: 30px 40px;
-    border-radius: 2px solid black;
+.seller-login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+    background: #fff; /* Updated to white for a cleaner look */
 }
-.wrapper h1{
-    font-size: 36px;
+
+.background-images {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none; /* Makes form clickable */
+}
+
+.background-images img {
+    position: absolute;
+    opacity: 0.1; /* Faint background effect */
+    animation: float 6s ease-in-out infinite;
+}
+
+.background-images img:nth-child(odd) {
+    left: 10%;
+    top: 20%;
+}
+
+.background-images img:nth-child(even) {
+    right: 15%;
+    bottom: 25%;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.login-wrapper {
+    z-index: 2;
+    width: 100%;
+    max-width: 400px;
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
-.wrapper .input-box{
+.login-wrapper h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.login-input-box {
     position: relative;
+    margin-bottom: 25px;
+}
+
+.login-input-box input {
     width: 100%;
     height: 50px;
-    /* background-color: salmon; */
-    margin: 30px 0;
-}
-
-.input-box input {
-    width:29%;
-    height: 100%;
-    background: transparent;
-    border: 2px solid black;
-    outline: none;
-    border-radius: 40px;
+    padding: 0 50px 0 15px;
+    border: 2px solid #ddd;
+    border-radius: 25px;
     font-size: 16px;
-    color: black;
-
+    color: #555;
+    outline: none;
+    transition: all 0.3s ease;
 }
 
-.input-box input::placeholder{
-    color: black;
+.login-input-box input:focus {
+    border-color: black;
+    background-color: #f9f9f9;
 }
 
-.input-box .icon{
+.login-input-box .icon {
     position: absolute;
-    right: 505px;
-    top: 48%;
+    right: 15px;
+    top: 50%;
     transform: translateY(-50%);
-    font-size: 20px;
+    font-size: 18px;
+    color: #999;
 }
 
-.wrapper .remember-forget {
+.login-remember-forget {
     display: flex;
     justify-content: space-between;
-    font-size: 14.5px;
-    margin: -15px 0 15px;
+    align-items: center;
+    font-size: 14px;
+    margin: 15px 0;
 }
 
-.remember-forget label input {
-    accent-color: black;
-    margin-right: 4px;
+.login-remember-forget label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
-.remember-forget a {
+.login-remember-forget a {
     color: black;
     text-decoration: none;
+    font-weight: 500;
 }
 
-.remember-forget a:hover{
+.login-remember-forget a:hover {
     text-decoration: underline;
 }
 
-.wrapper button{
-    width: 31%;
-    height: 45px;
+.login-button {
+    width: 100%;
+    height: 50px;
     background: black;
-    color: white;
+    color: #fff;
     border: none;
-    outline: none;
-    border-radius: 40px;
-    box-shadow: 0 0 10px rgba(0,0,0,.1);
-    cursor: pointer;
+    border-radius: 25px;
     font-size: 16px;
-    font-weight: 700;
-}
-
-.wrapper .register-link{
-    font-size: 14.5px;
-    text-align: center;
-    margin: 20px 0 15px;
-}
-
-.register-link p a{
-    color: black;
-    text-decoration: none;
     font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.register-link p a:hover{
+.login-button:hover {
+    background: black;
+}
+
+.login-error {
+    margin-top: 10px;
+    color: red;
+    font-size: 14px;
+}
+
+.login-register-link {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #555;
+}
+
+.login-register-link a {
+    color: black;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.login-register-link a:hover {
     text-decoration: underline;
+}
+
+/* Mobile Responsive Adjustments */
+@media screen and (max-width: 768px) {
+    .seller-login-container {
+        padding: 10px;
+    }
+
+    .login-wrapper {
+        padding: 20px;
+    }
+
+    .background-images img {
+        display: none; /* Hide background images for smaller screens */
+    }
 }

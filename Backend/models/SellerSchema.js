@@ -10,6 +10,7 @@ const SellerSchema = new mongoose.Schema({
     shopName: {
         type : String,
         required: true,
+        // unique: true
     },
     password: {
         type : String,
@@ -65,8 +66,8 @@ const SellerSchema = new mongoose.Schema({
         type: String,
         // required: true
     },
-
-
+    
+    
 })
 
 const SellerModel = mongoose.model('SellerSchema', SellerSchema);

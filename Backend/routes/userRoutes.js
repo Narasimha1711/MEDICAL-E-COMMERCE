@@ -1,4 +1,4 @@
-const { userInfo, userLogin, userRegister } = require('../controllers/userController.js');
+const { userInfo, userLogin, userRegister, userLogout } = require('../controllers/userController.js');
 const  { sellerInfo, sellerLogin, sellerSignup } = require('../controllers/sellerController.js')
 
 const express = require('express');
@@ -9,10 +9,11 @@ const router = express.Router();
 router.post('/login', userLogin);
 router.post('/register', userRegister);
 router.get('/user-info', userInfo)
+router.get('/logout', userLogout)
 
 router.post('/sellerSignup', sellerSignup)
 router.post('/sellerLogin', sellerLogin)
-router.post('/seller-info', sellerInfo)
+router.get('/seller-info', sellerInfo)
 
 
 

@@ -1,378 +1,314 @@
-// import "./SellerAddMedicine.css";
-
-// import SellerSidebar from "../Components/SellerSidebar.jsx";
-
-// import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
-// import { useContext, useEffect, useState } from "react";
-// import axios from "axios";
-// import { useNavigate } from "react-router-dom";
-// import { SellerContextData } from "../SellerContext.jsx";
-
-
-// const SellerAddMedicine = () => {
-
-//   const [file, setFile] = useState(null);
-//   const [medicineName, setMedicineName] = useState("");
-//   const [price, setPrice] = useState("");
-//   const [count, setCount] = useState("");
-//   const [description, setDescription] = useState("");
-//   const [category, setCategory] = useState("");
-
-//   const { sellerData, setSellerData } = useContext(SellerContextData);
-
-//   // Handle file selection and image preview
-//   const handleFileChange = (e) => {
-//     const selectedFile = e.target.files[0];
-//     setFile(selectedFile);
-//   };
-
-  
-
-//   useEffect(() => {
-//     const UserDetails = async () => {
-//         try {
-//             const response = await axios.get('/seller-info');
-//             const data = response.data; 
-//             setSellerData(data);
-//             // console.log(data)
-//             // setCartCount(data.cart.length);
-//             localStorage.setItem("SellerDetails", JSON.stringify(sellerData));
-
-//         } catch (err) {
-//             console.log(err);
-//             if (err.response.data.path === "/login") {
-//               navigate('/sellerLogin');
-//             }
-//         }
-//     };
-//     UserDetails();
-// }, []);
-
-//   // Handle form submission
-
-//   const navigate = useNavigate();
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     const formData = new FormData();
-//     formData.append("medicineName", medicineName);
-//     formData.append("price", price);
-//     formData.append("count", count);
-//     formData.append("description", description);
-//     formData.append("category", category);
-//     formData.append("image", file);
-
-//     // Log all the details including image name
-//     console.log("Medicine Name:", medicineName);
-//     console.log("Price:", price);
-//     console.log("Count:", count);
-//     console.log("Description:", description);
-//     console.log("Category:", category);
-//     console.log("File:", file ? file.name : "No file selected");
-    
-//     try {
-
-      
-//       const response = await axios.post('/addMedicine', formData, {
-//         headers: {
-//           "Content-Type": "multipart/form-data", // This is necessary for file uploads
-//         },
-//       });
-      
-//       const data = response.data;
-//       console.log("Added Successfully")
-//     }
-//     catch(err) {
-//       console.log(err);
-//       navigate('/sellerLogin')
-//     }
-
-//     // Reset the form fields after submission
-//     setMedicineName("");
-//     setFile(null); // Reset file state
-//     setPrice("");
-//     setCount("");
-//     setDescription("");
-//     setCategory("");
-//   };
-
-//   return (
-//     <div className="new">
-//       <SellerSidebar />
-//       <div className="newContainer">
-//         {/* <Navbar /> */}
-//         <div className="top">
-//           <h1>Add Your Medicine</h1>
-//         </div>
-//         <div className="bottom">
-//           <div className="left">
-//             {/* Display the selected image or a default image */}
-//             <img
-//               src={
-//                 file
-//                   ? URL.createObjectURL(file) // Preview the selected file
-//                   : "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg" // Default image
-//               }
-//               alt="Selected"
-//             />
-//           </div>
-//           <div className="right">
-//             <form onSubmit={handleSubmit}>
-//               <div className="formInput">
-//                 <label htmlFor="file">
-//                   Image :<DriveFolderUploadOutlinedIcon className="icon" />
-//                 </label>
-//                 {/* Trigger the hidden file input */}
-//                 <input
-//                   type="file"
-//                   id="file"
-//                   onChange={handleFileChange}
-//                   style={{ display: "none" }}
-//                   required
-                  
-//                 />
-//               </div>
-//               <div className="formInput">
-//                 <label>Medicine Name</label>
-//                 <input
-//                   type="text"
-//                   placeholder="Medicine Name"
-//                   value={medicineName}
-//                   onChange={(e) => setMedicineName(e.target.value)}
-//                   required
-//                 />
-//               </div>
-//               <div className="formInput">
-//                 <label>Price</label>
-//                 <input
-//                   type="text"
-//                   placeholder="Cost"
-//                   value={price}
-//                   onChange={(e) => setPrice(e.target.value)}
-//                 />
-//               </div>
-//               <div className="formInput">
-//                 <label>Count of the Medicine</label>
-//                 <input
-//                   type="text"
-//                   placeholder="Count"
-//                   value={count}
-//                   onChange={(e) => setCount(e.target.value)}
-//                   required
-//                 />
-//               </div>
-//               <div className="formInput">
-//                 <label>Category</label>
-//                 <input
-//                   type="text"
-//                   placeholder="Category"
-//                   value={category}
-//                   onChange={(e) => setCategory(e.target.value)}
-//                 />
-//               </div>
-//               <div className="formInput">
-//                 <label>Description of Medicine</label>
-//                 <textarea
-//                   rows="10"
-//                   width="300px"
-//                   type="text"
-//                   placeholder="Description of the Medicine"
-//                   value={description}
-//                   onChange={(e) => setDescription(e.target.value)}
-//                 />
-//               </div>
-//               <button type="submit">Send</button>
-//             </form>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default SellerAddMedicine;
-
-
-import "./SellerAddMedicine.css";
-import SellerSidebar from "../Components/SellerSidebar.jsx";
-import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
-import { useContext, useEffect, useState } from "react";
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
+import SellerSidebar from "../Components/SellerSidebar.jsx";
 import { SellerContextData } from "../SellerContext.jsx";
+import "./SellerAddMedicine.css";
 
+// Toast Component
+const Toast = ({ message, type, onClose, duration = 3000 }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, duration);
+
+    return () => clearTimeout(timer);
+  }, [duration, onClose]);
+
+  return (
+    <div
+      className={`fixed top-4 right-4 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg transition-all transform translate-y-0 
+        ${
+          type === "success"
+            ? "bg-green-500 text-white"
+            : "bg-red-500 text-white"
+        }`}
+    >
+      <span className="text-sm font-medium">{message}</span>
+      <button
+        onClick={onClose}
+        className="p-1 hover:bg-white/20 rounded-full transition-colors"
+      >
+        <span className="text-xl">&times;</span>
+      </button>
+    </div>
+  );
+};
+
+// Main Component
 const SellerAddMedicine = () => {
   const [file, setFile] = useState(null);
   const [medicineName, setMedicineName] = useState("");
   const [price, setPrice] = useState("");
   const [count, setCount] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("tablets");
+  const [discount, setDiscount] = useState("");
+  const [discountedPrice, setDiscountedPrice] = useState("");
+  const [location, setLocation] = useState({ lat: "", lon: "" });
+  const [toast, setToast] = useState(null);
 
   const { sellerData, setSellerData } = useContext(SellerContextData);
   const navigate = useNavigate();
 
-  // Handle file selection and image preview
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    setFile(selectedFile);
-  };
-
   useEffect(() => {
-    const UserDetails = async () => {
+    const fetchSellerDetails = async () => {
       try {
-        const response = await fetch('http://localhost:9001/seller-info', {
-          method: 'GET',
-          credentials: 'include', // To include cookies if required
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch seller info');
-        }
-
-        const data = await response.json();
-        setSellerData(data);
-        localStorage.setItem("SellerDetails", JSON.stringify(data));
+        const response = await axios.get("/seller-info");
+        setSellerData(response.data);
+        localStorage.setItem("SellerDetails", JSON.stringify(response.data));
       } catch (err) {
-        console.log(err);
-        navigate('/sellerLogin'); // Redirect on error
+        console.error(err);
+        if (err.response?.data?.path === "/login") {
+          setToast({ message: "Please login first", type: "error" });
+          setTimeout(() => navigate("/sellerLogin"), 2000);
+        }
       }
     };
-    UserDetails();
+    fetchSellerDetails();
   }, []);
 
-  // Handle form submission
+  
+
+  useEffect(() => {
+    if (price && discount) {
+      const discountValue = (parseFloat(price) * parseFloat(discount)) / 100;
+      const calculatedDiscountedPrice = parseFloat(price) - discountValue;
+      setDiscountedPrice(calculatedDiscountedPrice.toFixed(2)); // Round to 2 decimal places
+    } else {
+      setDiscountedPrice("");
+    }
+  }, [price, discount]);
+
+  const handleFileChange = (e) => setFile(e.target.files[0]);
+
+  const handleLocationFetch = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+          });
+          setToast({
+            message: "Location fetched successfully",
+            type: "success",
+          });
+        },
+        (error) =>
+          setToast({
+            message: `Error fetching location: ${error.message}`,
+            type: "error",
+          })
+      );
+    } else {
+      setToast({
+        message: "Geolocation is not supported by this browser",
+        type: "error",
+      });
+    }
+  };
+
+  const checkExistingMedicine = async (medicineName, price) => {
+    try {
+      const response = await axios.get(
+        `/checkMedicine?medicineName=${medicineName}&price=${price}`
+      );
+      return response.data.exists;
+    } catch (error) {
+      console.error("Error checking for existing medicine", error);
+      return false;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("medicineName", medicineName);
-    formData.append("price", price);
-    formData.append("count", count);
-    formData.append("description", description);
-    formData.append("category", category);
-    formData.append("image", file);
-
-    // Log all the details including image name
-    console.log("Medicine Name:", medicineName);
-    console.log("Price:", price);
-    console.log("Count:", count);
-    console.log("Description:", description);
-    console.log("Category:", category);
-    console.log("File:", file ? file.name : "No file selected");
-
     try {
-      const response = await fetch('http://localhost:9001/addMedicine', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include', // To include cookies if required
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to add medicine');
+      const medicineExists = await checkExistingMedicine(medicineName, price);
+      if (medicineExists) {
+        setToast({
+          message: "Medicine with the same name and price already exists",
+          type: "error",
+        });
+        return;
       }
 
-      const data = await response.json();
-      console.log("Added Successfully");
-    } catch (err) {
-      console.log(err);
-      navigate('/sellerLogin'); // Redirect on error
-    }
+      const formData = new FormData();
+      formData.append("medicineName", medicineName);
+      formData.append("price", price);
+      formData.append("count", count);
+      formData.append("description", description);
+      formData.append("category", category);
+      formData.append("discount", discount);
+      formData.append("discountedPrice", discountedPrice);
+      formData.append("location", JSON.stringify(location));
+      formData.append("image", file);
 
-    // Reset the form fields after submission
-    setMedicineName("");
-    setFile(null); // Reset file state
-    setPrice("");
-    setCount("");
-    setDescription("");
-    setCategory("");
+      await axios.post("/addMedicine", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      setToast({ message: "Medicine added successfully", type: "success" });
+
+      // Reset form after successful submission
+      setMedicineName("");
+      setFile(null);
+      setPrice("");
+      setCount("");
+      setDescription("");
+      setCategory("tablets");
+      setDiscount("");
+      setDiscountedPrice("");
+      setLocation({ lat: "", lon: "" });
+
+      setTimeout(() => navigate("/sellerInventory"), 2000);
+    } catch (err) {
+      setToast({
+        message: err.response?.data?.message || "Error adding medicine",
+        type: "error",
+      });
+      if (err.response?.data?.path === "/login") {
+        setTimeout(() => navigate("/sellerLogin"), 2000);
+      }
+    }
   };
 
   return (
-    <div className="new">
-      <SellerSidebar />
-      <div className="newContainer">
-        <div className="top">
-          <h1>Add Your Medicine</h1>
-        </div>
-        <div className="bottom">
-          <div className="left">
-            <img
-              src={
-                file
-                  ? URL.createObjectURL(file) // Preview the selected file
-                  : "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg" // Default image
-              }
-              alt="Selected"
-            />
+    <div className="new-dashboard">
+      <div className="new-dashboard__container">
+        <div className="new">
+          <SellerSidebar />
+          <div className="newContainer">
+            <div className="top">
+              <h1>Add Your Medicine</h1>
+            </div>
+            <div className="bottom">
+              <div className="left">
+                <img
+                  src={
+                    file
+                      ? URL.createObjectURL(file)
+                      : "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg"
+                  }
+                  alt="Selected"
+                />
+              </div>
+              <div className="right">
+                <form onSubmit={handleSubmit}>
+                  <div className="formInput">
+                    <label htmlFor="file">
+                      Image: <DriveFolderUploadOutlinedIcon className="icon" />
+                    </label>
+                    <input
+                      type="file"
+                      id="file"
+                      onChange={handleFileChange}
+                      style={{ display: "none" }}
+                      required
+                    />
+                  </div>
+                  <div className="formInput">
+                    <label>Medicine Name</label>
+                    <input
+                      type="text"
+                      placeholder="Medicine Name"
+                      value={medicineName}
+                      onChange={(e) => setMedicineName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="formInput">
+                    <label>Price</label>
+                    <input
+                      type="number"
+                      placeholder="Cost"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="formInput">
+                    <label>Discount Percentage</label>
+                    <input
+                      type="number"
+                      placeholder="Discount (%)"
+                      value={discount}
+                      onChange={(e) => setDiscount(e.target.value)}
+                    />
+                  </div>
+                  <div className="formInput">
+                    <label>Discounted Price</label>
+                    <input
+                      type="text"
+                      value={
+                        discountedPrice
+                          ? parseFloat(discountedPrice).toFixed(2)
+                          : ""
+                      }
+                      readOnly
+                      placeholder="Calculated Discounted Price"
+                    />
+                  </div>
+
+                  <div className="formInput">
+                    <label>Count of the Medicine</label>
+                    <input
+                      type="number"
+                      placeholder="Count"
+                      value={count}
+                      onChange={(e) => setCount(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="formInput">
+                    <label>Category</label>
+                    <select
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      required
+                    >
+                      <option value="tablets">Tablets</option>
+                      <option value="syrup">Syrup</option>
+                      <option value="capsules">Capsules</option>
+                    </select>
+                  </div>
+                  <div className="formInput">
+                    <label>Description of Medicine</label>
+                    <textarea
+                      rows="5"
+                      placeholder="Description of the Medicine"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
+                  </div>
+                  <div className="formInput">
+                    <label>Location</label>
+                    <button type="button" onClick={handleLocationFetch}>
+                      Fetch Location
+                    </button>
+                    <input
+                      type="text"
+                      value={`Lat: ${location.lat}, Lon: ${location.lon}`}
+                      readOnly
+                    />
+                  </div>
+                  <button type="submit">Add Medicine</button>
+                </form>
+              </div>
+            </div>
           </div>
-          <div className="right">
-            <form onSubmit={handleSubmit}>
-              <div className="formInput">
-                <label htmlFor="file">
-                  Image :<DriveFolderUploadOutlinedIcon className="icon" />
-                </label>
-                <input
-                  type="file"
-                  id="file"
-                  onChange={handleFileChange}
-                  style={{ display: "none" }}
-                  required
-                />
-              </div>
-              <div className="formInput">
-                <label>Medicine Name</label>
-                <input
-                  type="text"
-                  placeholder="Medicine Name"
-                  value={medicineName}
-                  onChange={(e) => setMedicineName(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="formInput">
-                <label>Price</label>
-                <input
-                  type="text"
-                  placeholder="Cost"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                />
-              </div>
-              <div className="formInput">
-                <label>Count of the Medicine</label>
-                <input
-                  type="text"
-                  placeholder="Count"
-                  value={count}
-                  onChange={(e) => setCount(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="formInput">
-                <label>Category</label>
-                <input
-                  type="text"
-                  placeholder="Category"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                />
-              </div>
-              <div className="formInput">
-                <label>Description of Medicine</label>
-                <textarea
-                  rows="10"
-                  width="300px"
-                  type="text"
-                  placeholder="Description of the Medicine"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
-              <button type="submit">Send</button>
-            </form>
-          </div>
         </div>
+        {toast && (
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast(null)}
+          />
+        )}
       </div>
     </div>
   );

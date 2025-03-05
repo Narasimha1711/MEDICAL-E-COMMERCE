@@ -1,47 +1,61 @@
 import "./sellerSidebar.css";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import BloodtypeSharpIcon from "@mui/icons-material/BloodtypeSharp";
-import MedicalInformationSharpIcon from "@mui/icons-material/MedicalInformationSharp";
-import PersonAddAltSharpIcon from "@mui/icons-material/PersonAddAltSharp";
-import PersonSharpIcon from "@mui/icons-material/PersonSharp";
-import LogoutSharpIcon from "@mui/icons-material/LogoutSharp";
+import { 
+  LayoutDashboard, 
+  PackageSearch, 
+  Pill, 
+  UserCog, 
+  User, 
+  LogOut,
+  Stethoscope
+} from 'lucide-react';
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const SellerSidebar = () => {
-  const location = useLocation(); // Get the current location
-  const [activeLink, setActiveLink] = useState(location.pathname); // Set initial active link based on the current path
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [activeLink, setActiveLink] = useState(location.pathname);
 
-  // Handle navigation and active state change
   const handleLinkClick = (path) => {
-    setActiveLink(path); // Update active link state
+    setActiveLink(path);
+  };
+
+  const handleLogout = () => {
+    handleLinkClick('/logout');
+    navigate('/sellerLogin');
   };
 
   return (
     <div className="sidebar">
       <div className="top">
-        <Link to="/" onClick={() => handleLinkClick("/")}>
+        <Link to="/dashboard" onClick={() => handleLinkClick("/dashboard")} className="logo-link">
+          <Stethoscope className="logo-icon" />
           <span className="logo">Epharmacy</span>
         </Link>
       </div>
-      <hr />
+      
       <div className="center">
-        <ul>
+        <ul className="nav-list">
           <p className="title">MAIN</p>
-          <Link to="/dashboard" onClick={() => handleLinkClick("/dashboard")}>
-            <li className={activeLink === "/dashboard" ? "active" : ""}>
-              <DashboardIcon className="icon" />
+          <Link 
+            to="/dashboard" 
+            onClick={() => handleLinkClick("/dashboard")}
+            className="nav-link"
+          >
+            <li className={`nav-item ${activeLink === "/dashboard" ? "active" : ""}`}>
+              <LayoutDashboard className="icon" />
               <span>Dashboard</span>
             </li>
           </Link>
 
-          <p className="title">LISTS</p>
+          <p className="title">INVENTORY</p>
           <Link
             to="/inventory"
             onClick={() => handleLinkClick("/inventory")}
+            className="nav-link"
           >
-            <li className={activeLink === "/inventory" ? "active" : ""}>
-              <BloodtypeSharpIcon className="icon" />
+            <li className={`nav-item ${activeLink === "/inventory" ? "active" : ""}`}>
+              <PackageSearch className="icon" />
               <span>Your Inventory</span>
             </li>
           </Link>
@@ -49,36 +63,42 @@ const SellerSidebar = () => {
           <Link
             to="/updateMedicine"
             onClick={() => handleLinkClick("/updateMedicine")}
+            className="nav-link"
           >
-            <li className={activeLink === "/updateMedicine" ? "active" : ""}>
-              <MedicalInformationSharpIcon className="icon" />
-              <span>Add and Update Medicine</span>
+            <li className={`nav-item ${activeLink === "/updateMedicine" ? "active" : ""}`}>
+              <Pill className="icon" />
+              <span>Manage Medicines</span>
             </li>
           </Link>
 
-          <Link to="/updateinfo" onClick={() => handleLinkClick("/updateinfo")}>
-            <li className={activeLink === "/updateinfo" ? "active" : ""}>
-              <PersonAddAltSharpIcon className="icon" />
-              <span>Update Details of User</span>
+          <p className="title">SETTINGS</p>
+          {/* <Link 
+            to="/revenuestats" 
+            onClick={() => handleLinkClick("/updateinfo")}
+            className="nav-link"
+          >
+            <li className={`nav-item ${activeLink === "/updateinfo" ? "active" : ""}`}>
+              <UserCog className="icon" />
+              <span>Revenue Stats</span>
             </li>
-          </Link>
+          </Link> */}
 
-          <p className="title">USER</p>
-          <Link to="/profile" onClick={() => handleLinkClick("/profile")}>
-            <li className={activeLink === "/profile" ? "active" : ""}>
-              <PersonSharpIcon className="icon" />
+          <Link 
+            to="/sellerProfile" 
+            onClick={() => handleLinkClick("/sellerProfile")}
+            className="nav-link"
+          >
+            <li className={`nav-item ${activeLink === "/sellerProfile" ? "active" : ""}`}>
+              <User className="icon" />
               <span>Profile</span>
             </li>
           </Link>
 
-          <li
-            className={activeLink === "/logout" ? "active" : ""}
-            onClick={() => {
-              handleLinkClick("/logout");
-              // Handle logout logic here if necessary
-            }}
+          <li 
+            className={`nav-item logout ${activeLink === "/logout" ? "active" : ""}`}
+            onClick={handleLogout}
           >
-            <LogoutSharpIcon className="icon" />
+            <LogOut className="icon" />
             <span>Logout</span>
           </li>
         </ul>

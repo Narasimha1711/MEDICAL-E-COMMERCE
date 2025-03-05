@@ -1,0 +1,174 @@
+/* Base styles */
+:root {
+    --primary-color: #4f46e5;
+    --primary-light: #818cf8;
+    --text-primary: #ffffff;
+    --text-secondary: #a0aec0;
+    --bg-dark: #000000;
+    --bg-darker: #111111;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+  
+  .about-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: var(--text-primary);
+    background-color: var(--bg-dark);
+  }
+  
+  /* Hero Section */
+  .hero-section {
+    text-align: center;
+    padding: 6rem 2rem;
+    background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+    color: white;
+    border-radius: 2rem;
+    margin-bottom: 6rem;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #333;
+  }
+  
+  .hero-section h1 {
+    font-size: 4rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    line-height: 1.2;
+    color: white;
+  }
+  
+  /* Team Section */
+  .team-section {
+    margin-bottom: 6rem;
+    text-align: center;
+    background-color: var(--bg-dark);
+    padding: 2rem;
+    border-radius: 1rem;
+  }
+  
+  .team-member {
+    background: var(--bg-darker);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    border: 1px solid #333;
+    color: var(--text-primary);
+  }
+  
+  /* Features Section */
+  .features-section {
+    margin-bottom: 6rem;
+    text-align: center;
+    background-color: var(--bg-dark);
+    padding: 2rem;
+    border-radius: 1rem;
+  }
+  
+  .feature-card {
+    background: var(--bg-darker);
+    padding: 2.5rem 2rem;
+    border-radius: 1.5rem;
+    border: 1px solid #333;
+    color: var(--text-primary);
+  }
+  
+  /* FAQ Section */
+  .faq-section {
+    margin-bottom: 6rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: var(--bg-dark);
+    padding: 2rem;
+    border-radius: 1rem;
+  }
+  
+  .faq-question {
+    background: var(--bg-darker);
+    border: 1px solid #333;
+    color: var(--text-primary);
+    width: 100%;
+    text-align: left;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem;
+  }
+  
+  .faq-answer {
+    background: var(--bg-darker);
+    border: 1px solid #333;
+    color: var(--text-secondary);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+  }
+  
+  /* Contact Section */
+  .contact-section {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--bg-dark);
+    border-radius: 2rem;
+    border: 1px solid #333;
+  }
+  
+  .contact-item {
+    background: var(--bg-darker);
+    padding: 2rem;
+    border-radius: 1.5rem;
+    border: 1px solid #333;
+    color: var(--text-primary);
+  }
+  
+  .social-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .social-link {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+  }
+  
+  .feature-icon, .contact-icon {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+  }
+  
+  .member-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+  }
+  
+  .member-title {
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+  }
+  
+  .member-bio {
+    color: var(--text-secondary);
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+  }
+  
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+  }
