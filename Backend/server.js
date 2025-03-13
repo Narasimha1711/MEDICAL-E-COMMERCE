@@ -15,6 +15,7 @@ const PORT = process.env.PORT || 9001;
 const secret = 'thisissecret'
 const path = require('path');
 const cron = require('node-cron')
+const csurf =  require('csurf');
 
 const OrderModel = require('./models/OrderSchema.js');
 // const { userRouter } = require('./routes/userRoutes');
@@ -26,8 +27,9 @@ connection();
 app.use(express.json())
 
 app.use(cors(corsOptions))
-
 app.use(cookieParser())
+app.use(csurf());
+
 
 app.use('/uploads', express.static('uploads'));
 
@@ -46,6 +48,12 @@ const upload = multer({ storage });
 
 
 app.use('/', userRoutes)
+
+
+app.use((err, req, res, next) => {
+    console.log(err)
+    res.status(500).json({message: "Internal Server Error"})
+});
 
 // app.post('/login', async (req, res) => {
     
@@ -361,8 +369,9 @@ app.post('/addToCart', async (req, res) => {
     }
 
     catch(err) {
-        console.log(err);
-        res.status(500).json({message: "Internal Server Error"})
+        // console.log(err);
+        // res.status(500).json({message: "Internal Server Error"})
+        throw new Error("Interval Server Error");
     }
 })
 
