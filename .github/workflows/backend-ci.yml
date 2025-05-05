@@ -1,0 +1,40 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Backend/**' # Trigger only for changes in the Backend folder
+  pull_request:
+    branches: [main]
+    paths:
+      - 'Backend/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Adjust to your Node.js version
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./Backend
+
+      # Step 4: Run tests
+      - name: Run tests
+        run: npm test
+        working-directory: ./Backend
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          RAZORPAY_KEY: ${{ secrets.RAZORPAY_KEY }}
+          RAZORPAY_SECRET: ${{ secrets.RAZORPAY_SECRET }}
