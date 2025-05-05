@@ -15,7 +15,14 @@ const PORT = process.env.PORT || 9001;
 const secret = 'thisissecret'
 const path = require('path');
 const cron = require('node-cron')
-const csurf =  require('csurf');
+const csrf = require("csurf"); // Ensure this is included
+
+
+var instance = new Razorpay({
+  key_id: process.env.RAZOR_PAY_KEY_ID,
+  key_secret: process.env.RAZOR_PAY_KEY_SECRET,
+});
+
 
 const OrderModel = require('./models/OrderSchema.js');
 // const { userRouter } = require('./routes/userRoutes');
@@ -28,7 +35,7 @@ app.use(express.json())
 
 app.use(cors(corsOptions))
 app.use(cookieParser())
-app.use(csurf());
+// app.use(csrf({ cookie: true }));
 
 
 app.use('/uploads', express.static('uploads'));
@@ -51,6 +58,9 @@ app.use('/', userRoutes)
 
 
 app.use((err, req, res, next) => {
+    // if (err.code === "EBADCSRFTOKEN") {
+    //   return res.status(403).json({ error: "Invalid CSRF token" });
+    // }
     console.log(err)
     res.status(500).json({message: "Internal Server Error"})
 });

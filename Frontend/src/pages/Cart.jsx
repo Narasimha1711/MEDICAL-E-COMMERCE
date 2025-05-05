@@ -205,7 +205,7 @@ function CartPage() {
     <div className="bg-gray-50 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
     {showNotification && <NotificationToast message={notificationMessage} type={type} />}
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-8">Cart</h1>
         
         <div className="bg-white rounded-lg shadow">
           {cartItems.length === 0 ? (
