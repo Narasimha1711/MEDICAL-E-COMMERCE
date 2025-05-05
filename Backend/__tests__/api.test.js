@@ -2,22 +2,19 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const app = require('../server'); // Adjust path as needed
+const app = require('../server');
 
 let mongoServer;
 
 beforeAll(async () => {
-  // Close any existing connections
+  jest.setTimeout(30000); // Increase timeout to 30 seconds for beforeAll
   await mongoose.connection.close();
-  
-  // Start in-memory MongoDB
   mongoServer = await MongoMemoryServer.create();
   const uri = mongoServer.getUri();
   await mongoose.connect(uri);
-});
+}, 30000); // Set timeout for the hook
 
 afterAll(async () => {
-  // Close connection and stop in-memory server
   if (mongoose.connection.readyState !== 0) {
     await mongoose.connection.close();
   }
