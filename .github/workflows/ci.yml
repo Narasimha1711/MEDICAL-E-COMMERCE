@@ -17,10 +17,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # Match package.json engines or Node version
+          node-version: '18'
       - name: Install dependencies
         run: npm install
-        working-directory: ./Frontend
+        working-directory: Frontend # Path from root
       - name: Run tests
         run: npm test
-        working-directory: ./Frontend
+        working-directory: Frontend # Path from root11
