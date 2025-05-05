@@ -1,5 +1,5 @@
 const express = require('express');
-const connection = require('./config/DbConnection');
+const {connection} = require('./config/DbConnection');
 const UserDoc = require('./models/UserSchema');
 const cors = require('cors');
 const corsOptions = require('./config/corsOptions');
@@ -11,7 +11,7 @@ const cookieParser = require('cookie-parser');
 const SellerModel = require('./models/SellerSchema');
 const MedicineModel = require('./models/Medicines');
 const multer = require('multer');
-const PORT = process.env.PORT || 9001;
+const PORT = process.env.PORT || 9002;
 const secret = 'thisissecret'
 const path = require('path');
 const cron = require('node-cron')
@@ -36,6 +36,30 @@ app.use(express.json())
 app.use(cors(corsOptions))
 app.use(cookieParser())
 // app.use(csrf({ cookie: true }));
+
+
+app.get('/', (req, res) => res.send('OK'));
+
+if (require.main === module) {
+  const port = process.env.PORT || 9001;
+  
+  // Connect to MongoDB and start server
+  const startServer = async () => {
+    try {
+      await connection(); // Use default URI from env
+      app.listen(port, () => {
+        console.log(`Server is listening on PORT ${port}`);
+      });
+    } catch (err) {
+      console.error('Failed to start server:', err);
+      process.exit(1);
+    }
+  };
+  
+  startServer();
+}
+
+
 
 
 app.get('/api/health', (req, res) => {
@@ -241,10 +265,10 @@ app.use((err, req, res, next) => {
 //     })
 // })
 
-app.get('/', async(req, res) => {
-    console.log("HOllo")
-    res.json({message: "HOllo"})
-})
+// app.get('/', async(req, res) => {
+//     console.log("HOllo")
+//     res.json({message: "HOllo"})
+// })
 
 app.post('/addMedicine', upload.single('image'), async (req, res) => {
 
@@ -610,6 +634,7 @@ app.post('/bookAllCart', async (req, res) => {
 
 // * * * * * -> it says that it sends request every minute
 
+if (process.env.NODE_ENV !== 'test') {
 cron.schedule('* * * * *', async () => {
     // console.log(Date.now())
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
@@ -654,7 +679,7 @@ cron.schedule('* * * * *', async () => {
   
     console.log('Checked and updated orders');
   });
-
+}
 
 
 app.post('/updateCount', async (req, res) => {
@@ -672,7 +697,7 @@ app.post('/updateCount', async (req, res) => {
             return res.status(401).json({ message: "Session has expired. Login in." });
         }
 
-        const sid = data.id;
+        let sid = data.id;
 
         // const user = await UserDoc.findOne({email: email});
 
@@ -1354,10 +1379,10 @@ app.post('/contact', async (req, res) => {
 
 
 
+module.exports = app;
 
 
 
-
-app.listen(PORT, () => {
-    console.log(`Server is listening on PORT ${PORT}`);
-})
+// app.listen(PORT, () => {
+//     console.log(`Server is listening on PORT ${PORT}`);
+// })
