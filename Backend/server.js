@@ -18,10 +18,10 @@ const cron = require('node-cron')
 const csrf = require("csurf"); // Ensure this is included
 
 
-var instance = new Razorpay({
-  key_id: process.env.RAZOR_PAY_KEY_ID,
-  key_secret: process.env.RAZOR_PAY_KEY_SECRET,
-});
+// var instance = new Razorpay({
+//   key_id: process.env.RAZOR_PAY_KEY_ID,
+//   key_secret: process.env.RAZOR_PAY_KEY_SECRET,
+// });
 
 
 const OrderModel = require('./models/OrderSchema.js');
@@ -36,6 +36,11 @@ app.use(express.json())
 app.use(cors(corsOptions))
 app.use(cookieParser())
 // app.use(csrf({ cookie: true }));
+
+
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ message: 'Server is healthy' });
+});
 
 
 app.use('/uploads', express.static('uploads'));
