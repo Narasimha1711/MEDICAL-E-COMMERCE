@@ -5,6 +5,8 @@ require("dotenv").config();
 const secret = process.env.JWT_SECRET;
 
 
+const isProd = process.env.NODE_ENV === 'production';
+
 
 const userLogin = async (req, res) => {
   const { email, password } = req.body;
@@ -27,8 +29,8 @@ const userLogin = async (req, res) => {
 
         res.cookie("token", token, {
           httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-          secure: false, // Set to true in production if using HTTPS
-          sameSite: "Lax", // Helps with CSRF protection
+          secure: isProd,
+          sameSite: isProd ? 'None' : 'Lax',
           maxAge: 20 * 60 * 1000, // 1 hour expiration
         });
         return res
@@ -74,6 +76,7 @@ const userRegister = async (req, res) => {
 const userInfo = async (req, res) => {
   const cookieData = req.cookies.token;
   // console.log(cookieData) 
+  console.log("HI", cookieData)
 
   if (!cookieData) {
     return res
@@ -101,8 +104,8 @@ const userLogout = async (req, res) => {
 
   res.clearCookie('token', {
     httpOnly: true,
-    secure: false, // Set to true in production if using HTTPS
-    sameSite: "Lax",
+    secure: isProd,
+    sameSite: isProd ? 'None' : 'Lax',
     path: '/',
   });
   res.status(200).json({ message: "Logged out successfully" });

@@ -45,8 +45,8 @@ const sellerLogin = async (req, res) => {
             
             res.cookie('token1', token, {
                 httpOnly: true,   // Prevents client-side JavaScript from accessing the cookie
-                secure: false,    // Set to true in production if using HTTPS
-                sameSite: 'Lax',  // Helps with CSRF protection
+                secure: isProd,
+                sameSite: isProd ? 'None' : 'Lax',
                 maxAge: 10 * 60 * 1000 // 1 hour expiration
             });
             return res.status(200).json({message: "Succesfully Created", seller: isExistSeller })

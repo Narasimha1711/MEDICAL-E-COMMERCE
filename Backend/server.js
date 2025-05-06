@@ -18,6 +18,11 @@ const cron = require('node-cron')
 const csrf = require("csurf"); // Ensure this is as included
 
 
+const isProd = process.env.NODE_ENV == 'production';
+
+
+console.log('NODE_ENV:', process.env.NODE_ENV);
+
 // var instance = new Razorpay({
 //   key_id: process.env.RAZOR_PAY_KEY_ID,
 //   key_secret: process.env.RAZOR_PAY_KEY_SECRET,
@@ -477,8 +482,8 @@ app.get('/inventory', async (req, res) => {
 app.post('/sellerLogout', (req, res) => {
     res.cookie('token', '', { 
         httpOnly: true, 
-        secure: false,  // Set to true in production if using HTTPS
-        sameSite: 'Lax', 
+        secure: isProd,
+        sameSite: isProd ? 'None' : 'Lax',
         maxAge: 0       // Expire the cookie immediately
     });
     return res.status(200).json({message: "Successfully logged out"});
@@ -830,8 +835,8 @@ app.put('/userUpdatedetails', async (req, res) => {
 
             res.cookie('token', token, {
                 httpOnly: true,   // Prevents client-side JavaScript from accessing the cookie
-                secure: false,    // Set to true in production if using HTTPS
-                sameSite: 'Lax',  // Helps with CSRF protection
+                secure: isProd,
+                sameSite: isProd ? 'None' : 'Lax',
                 maxAge: 5 * 60 * 1000 // 1 hour expiration
             });
             console.log("success");
