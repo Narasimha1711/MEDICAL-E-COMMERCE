@@ -18,7 +18,7 @@ const cron = require('node-cron')
 const csrf = require("csurf"); // Ensure this is as included
 
 
-const isProd = process.env.NODE_ENV == 'production';
+const isProd = process.env.NODE_ENV === 'production';
 
 
 console.log('NODE_ENV:', process.env.NODE_ENV);
