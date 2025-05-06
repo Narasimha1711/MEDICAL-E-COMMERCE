@@ -188,7 +188,7 @@ function SearchedItems() {
             <div key={product._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
               <div className="relative">
                 {/* <img src={`http://localhost:9001/uploads/${medicine.image}`} alt={medicine.name} /> */}
-                <img src={`http://localhost:9001/uploads/${product.image}`} className="w-full h-48 object-cover" />
+                <img src={`/uploads/${product.image}`} className="w-full h-48 object-cover" />
                 <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-sm font-semibold">
                   -{product.discount}%
                 </div>

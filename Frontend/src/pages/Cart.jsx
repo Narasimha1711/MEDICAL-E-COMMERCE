@@ -219,7 +219,7 @@ function CartPage() {
                   <div key={item._id} className="flex items-center p-6 hover:bg-gray-50">
                     <img 
                       // src={item.image} 
-                      src={`http://localhost:9001/uploads/${item.image}`} 
+                      src={`${import.meta.env.VITE_API_BASE_URL}/uploads/${item.image}`} 
                       alt={item.name} 
                       className="w-20 h-20 object-cover rounded"
                     />

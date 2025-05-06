@@ -20,7 +20,7 @@ const SellerProfile = () => {
   const loadProfile = async () => {
     try {
       // No need to manually get the token from localStorage since it's in cookies
-      const response = await fetch("http://localhost:9001/givesellerdata", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/givesellerdata`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -98,7 +98,7 @@ const SellerProfile = () => {
       // Update profile details
       if (formData.shopName || formData.location || formData.gstin) {
         const response = await fetch(
-          "http://localhost:9001/updatesellerprofile",
+          `${import.meta.env.VITE_API_BASE_URL}/updatesellerprofile`,
           {
             method: "PATCH",
             headers: {
@@ -121,7 +121,7 @@ const SellerProfile = () => {
       // Update password if provided
       if (formData.currentPassword && formData.newPassword) {
         const passwordResponse = await fetch(
-          "http://localhost:9001/updatepassword",
+          `${import.meta.env.VITE_API_BASE_URL}/updatepassword`,
           {
             method: "PATCH",
             headers: {

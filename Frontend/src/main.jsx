@@ -10,7 +10,7 @@ import { Provider } from 'react-redux'
 import { persistor, store } from './app/store.js'
 import { PersistGate } from 'redux-persist/integration/react';
 
-axios.defaults.baseURL = 'http://localhost:9001'
+axios.defaults.baseURL = `${import.meta.env.VITE_API_BASE_URL}`
 axios.defaults.withCredentials = true;
 
 createRoot(document.getElementById('root')).render(

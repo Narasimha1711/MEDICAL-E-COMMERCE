@@ -34,7 +34,6 @@ import UserProfilePage from './pages/UserProfilePage'
 import ContactUs from './pages/ContactUs'
 import AboutUs from './pages/AboutUs'
 
-import Header from './components/Blog/Header/Header';
 import Feed from './components/Blog/Posts/Feed';
 import CreatePost from './components/Blog/Posts/CreatePost';
 import Profile from './components/Blog/Profile/Profile';

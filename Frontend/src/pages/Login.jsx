@@ -110,13 +110,13 @@ const Login = () => {
 
     clearUserDetais()
   }, [])
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:9001/login', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -26,7 +26,7 @@ ChartJS.register(
   Legend
 );
 
-const API_BASE_URL = 'http://localhost:9001/';
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 const SELLER_ID = '674f0636a38e8481e24978a8';
 
 const TIME_RANGES = [

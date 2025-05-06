@@ -18,7 +18,7 @@ export default function SellerLogin() {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:9001/sellerLogin', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/sellerLogin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

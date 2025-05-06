@@ -97,7 +97,7 @@ export default function YourInventory() {
                     <tr key={index} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <img
-                          src={`http://localhost:9001/uploads/${row.image}`}
+                          src={`${import.meta.env.VITE_API_BASE_URL}/uploads/${row.image}`}
                           alt={row.medicine}
                           className="h-16 w-16 object-cover rounded-lg shadow-sm"
                         />

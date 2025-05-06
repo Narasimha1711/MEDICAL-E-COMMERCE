@@ -72,7 +72,7 @@ const ContactForm = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await axios.post('http://localhost:9001/contact', formData, {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/contact`, formData, {
         headers: { 'Content-Type': 'application/json' },
       });
       alert(response.data.message || 'Message sent successfully!');

@@ -130,7 +130,7 @@ const ProductCard = ({ product }) => {
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
       <div className="relative">
         <img 
-          src={`http://localhost:9001/uploads/${product.image}`} 
+          src={`${import.meta.env.VITE_API_BASE_URL}/uploads/${product.image}`} 
           className="w-full h-48 object-cover" 
           alt={product.name}
         />

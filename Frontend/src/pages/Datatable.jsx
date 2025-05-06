@@ -9,7 +9,7 @@ import "./datatable.css";
 
 // Async thunks for fetching, updating, and deleting inventory
 const fetchInventory = createAsyncThunk("inventory/fetchInventory", async () => {
-  const response = await fetch("http://localhost:9001/inventory", {
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/inventory`, {
     method: "GET",
     credentials: "include",
     headers: {
@@ -21,7 +21,7 @@ const fetchInventory = createAsyncThunk("inventory/fetchInventory", async () => 
 });
 
 const updateQuantity = createAsyncThunk("inventory/updateQuantity", async ({ id, count }) => {
-  const response = await fetch("http://localhost:9001/updateCount", {
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/updateCount`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -32,7 +32,7 @@ const updateQuantity = createAsyncThunk("inventory/updateQuantity", async ({ id,
 });
 
 const deleteMedicine = createAsyncThunk("inventory/deleteMedicine", async (id) => {
-  const response = await fetch(`http://localhost:9001/inventory/${id}`, {
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/inventory/${id}`, {
     method: "DELETE",
     credentials: "include",
   });
@@ -205,7 +205,7 @@ function MedicineCard() {
               {filteredRows.map((row) => (
                 <div key={row._id} className="medicine-card">
                   <div className="image-container">
-                    <img src={`http://localhost:9001/uploads/${row.image}`} alt={row.medicineName} className="medicine-image" />
+                    <img src={`${import.meta.env.VITE_API_BASE_URL}/uploads/${row.image}`} alt={row.medicineName} className="medicine-image" />
                     <button onClick={() => handleDeleteClick(row._id)} className="delete-button">
                       <Trash2 size={20} />
                     </button>
