@@ -169,17 +169,18 @@ import UserProfilePage from './pages/UserProfilePage'
 import ContactUs from './pages/ContactUs'
 import AboutUs from './pages/AboutUs'
 
-import Header from './components/Blog/Header/Header';
-import Feed from './components/Blog/Posts/Feed';
-import CreatePost from './components/Blog/Posts/CreatePost';
-import Profile from './components/Blog/Profile/Profile';
+// import Header from './components/Blog/Header/Header';
+import Feed from './Components/Blog/Posts/Feed';
+// import CreatePost from './Components/Blog/Posts/CreatePost';
+import CreatePost from './Components/Blog/Posts/CreatePost';
+import Profile from './Components/Blog/Profile/Profile';
 import BlogLayout from './Components/BlogLayout'
 import SellerProfile from './pages/SellerProfile'
 import SellerRevenue from './pages/SellerRevenueStats'
-import revenuestats from './pages/SellerRevenueStats'
+// import revenuestats from './pages/SellerRevenueStats'
 import SellerRevenueStats from './pages/SellerRevenueStats'
-import SellerToSellerLogin from '../components/SellerToSellerLogin'
-import SellerToSellerPage from '../components/SellerToSellerPage'
+import SellerToSellerLogin from '../Components/SellerToSellerLogin'
+import SellerToSellerPage from '../Components/SellerToSellerPage'
 import SellerB2B from './pages/SellerB2B'
 import SellerContext from './SellerContext'
 // import SellerAddMedicine from './pages/SellerAddMedicine'
