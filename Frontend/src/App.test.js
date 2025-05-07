@@ -7,7 +7,7 @@ import { BrowserRouter } from 'react-router-dom';
 import Home from './pages/Home';
 import NormalHome from './components/NormalHome';
 const { useUserHomeCurrentOrdersQuery, useUserHomeTopDealsQuery } = require('./app/addCartSlice');
-
+//Mock test
 // Mock apiSlice
 jest.mock('./app/apiSlice', () => {
   const mockApiSlice = {
