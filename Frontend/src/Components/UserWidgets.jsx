@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import "./userWidgets.css";
-import KeyboardArrowUpIcon from "@mui/icons-material/keyboardArrowUp";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 const UserWidgets = ({name,count,see,icon}) => {
   return (
     <div className="widget">
