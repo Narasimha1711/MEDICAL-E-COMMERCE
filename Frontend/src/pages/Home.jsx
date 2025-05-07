@@ -1,14 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { ContextData} from '../Context';
 import './home.css'
-import Card from '../Components/Card_med';
-import Category from '../Components/Category';
-import axios from 'axios';
+// import Card from '../Components/Card_med';
+// import Category from '../Components/Category';
+// import axios from 'axios';
 import NormalHome from '../Components/NormalHome';
 import SearchedItems from '../Components/SearchedItems';
 import { SearchContextCreate } from '../SearchContext';
 import { useSelector } from 'react-redux';
-import NotificationToast from '../Components/NotificationToast';
+// import NotificationToast from '../Components/NotificationToast';
 // import { useHeQuery, useSearchItemsMutation } from '../app/getProducts';
 
 

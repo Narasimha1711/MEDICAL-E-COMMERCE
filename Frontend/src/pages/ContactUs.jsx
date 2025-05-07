@@ -1,6 +1,6 @@
-import ContactForm from '../components/Contact/ContactForm';
-import ContactInfo from '../components/Contact/ContactInfo';
-import Map from '../components/Contact/Map';
+import ContactForm from '../Components/Contact/ContactForm';
+import ContactInfo from '../Components/Contact/ContactInfo';
+import Map from '../Components/Contact/Map';
 import { FaHeartbeat } from 'react-icons/fa';
 
 function ContactUs() {

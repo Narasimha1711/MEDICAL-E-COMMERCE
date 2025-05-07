@@ -40,7 +40,7 @@ import SellerToSellerForm from "../../components/SellerToSellerForm";
 import SellerToSellerPage from "../../components/SellerToSellerPage";
 import AvailableStock from "./Availablestock";
 import { SellerContextData } from "../SellerContext";
-import SellerSidebar from "../Components/SellerSidebar";
+// import SellerSidebar from "../Components/SellerSidebar";
 import { ShoppingBag, Pill, RefreshCw, Store, ClipboardList } from "lucide-react";
 
 const SellerB2B = () => {

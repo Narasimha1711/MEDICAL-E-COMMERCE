@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
 import { MapPin, Lock, Store, Building2 } from "lucide-react";
 import SellerSidebar from "../Components/SellerSidebar";
 const API_URL = "http://localhost:5000/api/sellers";
