@@ -126,6 +126,27 @@ const UserSchema = new mongoose.Schema({
 }
 )
 
+// Add indexes for frequently queried fields
+UserSchema.index({ email: 1 }, { unique: true }); // Unique index for email (login)
+UserSchema.index({ username: 1 }); // Index for username searches
+UserSchema.index({ 'cart._id': 1 }); // Index for cart item lookups
+UserSchema.index({ 'booked.orderId': 1 }); // Index for order lookups
+UserSchema.index({ 'received.orderId': 1 }); // Index for received orders
+
+// Add query performance logging in development
+if (process.env.NODE_ENV === 'development') {
+    UserSchema.pre(['find', 'findOne'], function() {
+        console.time(`UserQuery-${this.op}`);
+    });
+    
+    UserSchema.post(['find', 'findOne'], function() {
+        console.timeEnd(`UserQuery-${this.op}`);
+    });
+}
+
 const UserModel = mongoose.model('UserSchema', UserSchema);
 
 module.exports = UserModel;
+
+
+

@@ -10,18 +10,39 @@ const cookie = require('cookie');
 const cookieParser = require('cookie-parser');
 const SellerModel = require('./models/SellerSchema');
 const MedicineModel = require('./models/Medicines');
+const SellerToSellerRequest = require('./models/SellerToSellerRequest');
 const multer = require('multer');
 const PORT = process.env.PORT || 9002;
 const secret = 'thisissecret'
 const path = require('path');
 const cron = require('node-cron')
 const csrf = require("csurf"); // Ensure this is as included
+const algoliasearch = require('algoliasearch');
+const redis = require('redis');
+const redisClient = require('./config/redis.js');
+
+// Seller-to-Seller B2B API Router
+const sellerToSellerRoutes = require('./routes/sellerToSellerRoutes');
+const chalk = require('chalk');
 
 //f
 const isProd = process.env.NODE_ENV === 'production';
 
 
+// Angolia Search 
+
+// const client = algoliasearch('N7ADFVXWHO', '5c66334238d6abf77f4666de16982a21');
+// const index = client.initIndex('medicines');
+
+
 console.log('NODE_ENV:', process.env.NODE_ENV);
+
+
+//Router Level Middleware
+const userRoutes = require('./routes/userRoutes.js');
+const queryPlanningRoutes = require('./routes/queryPlanningRoutes');
+const queryAnalysisRoutes = require('./routes/queryAnalysis');
+const s2sRoutes = require('./routes/s2sRoutes');
 
 // var instance = new Razorpay({
 //   key_id: process.env.RAZOR_PAY_KEY_ID,
@@ -32,7 +53,7 @@ console.log('NODE_ENV:', process.env.NODE_ENV);
 const OrderModel = require('./models/OrderSchema.js');
 // const { userRouter } = require('./routes/userRoutes');
 // import userRoutes from './routes/userRoutes.js'
-const userRoutes = require('./routes/userRoutes.js');
+
 
 connection();
 
@@ -41,6 +62,33 @@ app.use(express.json())
 app.use(cors(corsOptions))
 app.use(cookieParser())
 // app.use(csrf({ cookie: true }));
+
+
+
+// Create index for medicine name (handle existing index)
+async function ensureIndexes() {
+  try {
+      // First, check if index exists
+      const indexes = await MedicineModel.collection.getIndexes();
+      const hasNameIndex = indexes.hasOwnProperty('name_1');
+      
+      if (!hasNameIndex) {
+          // Create regular index if it doesn't exist
+          await MedicineModel.collection.createIndex({ name: 1 }, { 
+              background: true,
+              name: 'name_1'
+          });
+          console.log(chalk.green('✓ Index created on medicine name field'));
+      } else {
+          console.log(chalk.blue('ℹ Index already exists on medicine name field'));
+      }
+  } catch (err) {
+      console.log(chalk.red('Error managing indexes:', err));
+  }
+}
+
+// Call ensureIndexes after DB connection
+ensureIndexes();
 
 
 app.get('/', (req, res) => res.send('OK'));
@@ -65,14 +113,91 @@ if (require.main === module) {
 }
 
 
-
-
 app.get('/api/health', (req, res) => {
   res.status(200).json({ message: 'Server is healthy' });
 });
 
 
 app.use('/uploads', express.static('uploads'));
+
+
+
+// Seller-to-Seller B2B API
+app.use('/api/seller2seller', sellerToSellerRoutes);
+app.use('/s2s', s2sRoutes);
+
+// --- SELLER-TO-SELLER B2B API ROUTES ---
+const sellerToSellerRouter = express.Router();
+
+// Seller-to-Seller Login (no signup)
+sellerToSellerRouter.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  const seller = await SellerModel.findOne({ email });
+  if (!seller) return res.status(401).json({ message: 'No seller found' });
+  const isValid = bcryptjs.compareSync(password, seller.password);
+  if (!isValid) return res.status(401).json({ message: 'Invalid credentials' });
+  res.json({ seller });
+});
+
+// Create a seller-to-seller buy/sell request
+sellerToSellerRouter.post('/request', async (req, res) => {
+  const { sellerId, type, medicineName, quantity } = req.body;
+  if (!sellerId || !type || !medicineName || !quantity) {
+    return res.status(400).json({ message: 'Missing fields' });
+  }
+  const request = await SellerToSellerRequest.create({ sellerId, type, medicineName, quantity });
+  res.status(201).json(request);
+});
+
+// Get all seller-to-seller requests
+sellerToSellerRouter.get('/requests', async (req, res) => {
+  const requests = await SellerToSellerRequest.find().populate('sellerId', 'shopName email');
+  res.json(requests);
+});
+
+// Fulfill a seller-to-seller request
+sellerToSellerRouter.post('/fulfill', async (req, res) => {
+  const { reqId, sellerId } = req.body;
+  const request = await SellerToSellerRequest.findById(reqId);
+  if (!request || request.status !== 'pending') return res.status(400).json({ message: 'Invalid request' });
+
+  // Update medicine stock for both sellers
+  const sellerFrom = await SellerModel.findById(request.sellerId);
+  const sellerTo = await SellerModel.findById(sellerId);
+  if (!sellerFrom || !sellerTo) return res.status(400).json({ message: 'Sellers not found' });
+
+  // Find medicine in sellerFrom
+  const medFrom = sellerFrom.medicinesUploaded.find(m => m.name === request.medicineName);
+  if (!medFrom || medFrom.count < request.quantity) {
+    return res.status(400).json({ message: 'Not enough stock' });
+  }
+  medFrom.count -= request.quantity;
+
+  // Add/increment medicine in sellerTo
+  let medTo = sellerTo.medicinesUploaded.find(m => m.name === request.medicineName);
+  if (medTo) {
+    medTo.count += request.quantity;
+  } else {
+    sellerTo.medicinesUploaded.push({
+      name: request.medicineName,
+      count: request.quantity,
+      price: medFrom.price || 0,
+      description: medFrom.description || '',
+      category: medFrom.category || '',
+      discount: medFrom.discount || 0,
+      discountedPrice: medFrom.discountedPrice || 0
+    });
+  }
+  await sellerFrom.save();
+  await sellerTo.save();
+  request.status = 'fulfilled';
+  request.targetSellerId = sellerId;
+  await request.save();
+  res.json({ message: 'Request fulfilled', request });
+});
+
+app.use('/api/seller2seller', sellerToSellerRouter);
+// --- END SELLER-TO-SELLER B2B API ROUTES ---
 
 
 const storage = multer.diskStorage({
@@ -99,6 +224,8 @@ app.use((err, req, res, next) => {
     res.status(500).json({message: "Internal Server Error"})
 });
 
+
+app.use('/api', queryAnalysisRoutes)
 // app.post('/login', async (req, res) => {
     
 //     const { email, password } = req.body;
@@ -332,28 +459,168 @@ app.post('/addMedicine', upload.single('image'), async (req, res) => {
     
 
     res.status(200);
+
+  })
+
+
+  app.get('/allMedicines', async (req, res) => {
+    try {
+        const searchQuery = req.query.search || 'ALL';
+        
+        // Prepare search conditions
+        let searchRegex;
+        if (searchQuery.toUpperCase() === 'ALL') {
+            searchRegex = {};
+        } else {
+            searchRegex = { name: { $regex: searchQuery, $options: 'i' } };
+        }
+
+        // Get total document count
+        const totalDocs = await MedicineModel.countDocuments();
+
+        // 1. First perform non-indexed search (collection scan)
+        console.log(chalk.yellow('\n=== Running search WITHOUT index (collection scan) ==='));
+        const noIndexResult = await MedicineModel.find(searchRegex)
+            .hint({ $natural: 1 }) // Force collection scan
+            .setOptions({ forceCollectionScan: true }); // Add this flag for our middleware
+
+        // Small delay to separate logs
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // 2. Then perform indexed search
+        console.log(chalk.yellow('\n=== Running search WITH index ==='));
+        const withIndexResult = await MedicineModel.find(searchRegex)
+            .setOptions({ useIndex: true }); // Add this flag for our middleware
+
+        // Return results
+        res.json({
+            searchTerm: searchQuery,
+            totalDocuments: totalDocs,
+            results: withIndexResult
+        });
+
+    } catch (error) {
+        console.error('Search error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
     
-})
+    
 
 app.post('/allMedicines', async (req, res) => {
 
-    // console.log(req.body)
+    console.log(req.body)
     const { searchItem } = req.body;
     // console.log(searchItem)
+
+    // try {
+      // const medicines = await MedicineModel.find({
+        //     name: { $regex: searchItem, $options: 'i' } // 'i' makes it case-insensitive
+        // });
+        // // console.log(medicines)
+        // res.status(200).json(medicines);
+
+        // Prepare search conditions
+    // }
     try {
 
-        const medicines = await MedicineModel.find({
-            name: { $regex: searchItem, $options: 'i' } // 'i' makes it case-insensitive
-        });
-        // console.log(medicines)
-        res.status(200).json(medicines);
+        // const medicines = await MedicineModel.find({
+        //     name: { $regex: searchItem, $options: 'i' } // 'i' makes it case-insensitive
+        // });
+        // // console.log(medicines)
+        // res.status(200).json(medicines);
+
+        // Prepare search conditions
+        let searchRegex;
+        if (!searchItem || searchItem.trim() === '') {
+            searchRegex = {};
+        } else {
+            searchRegex = { name: { $regex: searchItem, $options: 'i' } };
+        }
+
+        // Get total document count
+        const totalDocs = await MedicineModel.countDocuments();
+
+        // 1. First perform non-indexed search (collection scan)
+        console.log(chalk.yellow('\n=== Running search WITHOUT index (collection scan) ==='));
+        const noIndexResult = await MedicineModel.find(searchRegex)
+            .hint({ $natural: 1 }) // Force collection scan
+            .setOptions({ forceCollectionScan: true }); // Add this flag for our middleware
+
+        // Small delay to separate logs
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // 2. Then perform indexed search
+        console.log(chalk.yellow('\n=== Running search WITH index ==='));
+        const withIndexResult = await MedicineModel.find(searchRegex)
+            .setOptions({ useIndex: true }); // Add this flag for our middleware
+
+        // Return just the results array to maintain compatibility with frontend
+        res.status(200).json(withIndexResult);
         
     }
 
     catch(err) {
-        console.log(err);
+        // console.log(err);
+        console.error('Search error:', error);
+        res.status(500).json({ error: error.message });
     }
+
+  //   const { searchItem } = req.body;
+  // try {
+  //   const result = await index.search(searchItem, {
+  //     attributesToRetrieve: ['name', 'description', 'category', 'price', 'discountedPrice', 'discount', 'count', 'image'], // Fields to return
+  //     facets: ['category'], // Enable faceted search
+  //     hitsPerPage: 20
+  //   });
+  //   res.status(200).json(result);
+  // } catch (error) {
+  //   console.error('Search error:', error);
+  //   res.status(500).json({ error: 'Search failed' });
+  // }
 })
+
+
+
+app.get('/test-medicine-search', async (req, res) => {
+  try {
+      const searchTerm = req.query.search || 'para';
+      
+      // Test without index hint
+      console.time('Without Index');
+      const withoutIndex = await MedicineModel.find({ 
+          name: { $regex: searchTerm, $options: 'i' } 
+      }).explain('executionStats');
+      console.timeEnd('Without Index');
+      
+      // Test with index hint
+      console.time('With Index');
+      const withIndex = await MedicineModel.find({ 
+          name: { $regex: searchTerm, $options: 'i' } 
+      }).hint({ name: 1 }).explain('executionStats');
+      console.timeEnd('With Index');
+      
+      res.json({
+          withoutIndex: {
+              executionTimeMs: withoutIndex.executionStats.executionTimeMillis,
+              docsExamined: withoutIndex.executionStats.totalDocsExamined,
+              docsReturned: withoutIndex.executionStats.nReturned,
+              indexUsed: withoutIndex.queryPlanner.winningPlan.inputStage?.indexName || 'None'
+          },
+          withIndex: {
+              executionTimeMs: withIndex.executionStats.executionTimeMillis,
+              docsExamined: withIndex.executionStats.totalDocsExamined,
+              docsReturned: withIndex.executionStats.nReturned,
+              indexUsed: withIndex.queryPlanner.winningPlan.inputStage?.indexName || 'None'
+          }
+      });
+  } catch (error) {
+      console.error('Search performance test error:', error);
+      res.status(500).json({ error: error.message });
+  }
+});
 
 app.post('/addToCart', async (req, res) => {
 
@@ -421,37 +688,169 @@ app.post('/addToCart', async (req, res) => {
 
 app.get('/addToCart', async (req, res) => {
 
+  try {
+    const token = req.cookies.token;
+
+    jwt.verify(token, secret, {}, async (err, data) => {
+      if (err) {
+        return res.status(401).json({ message: "Session has expired. Login in." });
+      }
+
+      const userEmail = data.email;
+      const cacheKey = `cart:${userEmail}`;
+      const startTime = performance.now(); // Start timing
+
+      let source = 'database'; // Default to database
+      let responseData = null;
+
+      try {
+        // Check if Redis is connected and try to get cached data
+        if (redisClient.isOpen) {
+          console.log("coming up")
+          const cachedCart = await redisClient.get(cacheKey);
+          if (cachedCart) {
+            source = 'cache';
+            console.log('Serving from cache');
+            responseData = JSON.parse(cachedCart);
+            const endTime = performance.now();
+            console.log(`Response Time [${source}]: ${(endTime - startTime).toFixed(2)} ms`);
+            return res.status(200).json({
+              message: "added to cart",
+              items: responseData.items,
+              itemsCount: responseData.itemsCount,
+            });
+          }
+        } else {
+          console.log('Redis not connected, skipping cache');
+        }
+      } catch (redisErr) {
+        console.error('Redis error:', redisErr.message);
+      }
+      console.log("NO not now")
+      // Query database if cache miss or Redis unavailable
+      const doc = await UserDoc.findOne({ email: userEmail });
+      const arr = [];
+      for (let i = 0; i < doc.cart.length; i++) {
+        const id = doc.cart[i]._id;
+
+        const noo = await MedicineModel.findById(id);
+        console.log(noo);
+        const foundItemCount = noo.count;
+        arr.push(foundItemCount);
+      }
+
+      // Store in Redis only if connected
+      if (redisClient.isOpen) {
+        try {
+          const cacheData = JSON.stringify({ items: doc.cart, itemsCount: arr });
+          await redisClient.setEx(cacheKey, 3600, cacheData);
+          console.log('Cached cart in Redis');
+        } catch (redisErr) {
+          console.error('Failed to cache in Redis:', redisErr.message);
+        }
+      }
+
+      const endTime = performance.now();
+      console.log(`Response Time [${source}]: ${(endTime - startTime).toFixed(2)} ms`);
+
+      res.status(200).json({ message: "added to cart", items: doc.cart, itemsCount: arr });
+    });
+  } catch (err) {
+    console.error('Server error:', err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+
+  // try {
+  //   const token = req.cookies.token;
+
+  //   jwt.verify(token, secret, {}, async (err, data) => {
+  //     if (err) {
+  //       return res.status(401).json({ message: "Session has expired. Login in." });
+  //     }
+
+  //     const userEmail = data.email;
+  //     const cacheKey = `cart:${userEmail}`;
+
+  //     try {
+  //       // Check if Redis is connected and try to get cached data
+  //       if (redisClient.isOpen) {
+  //         const cachedCart = await redisClient.get(cacheKey);
+  //         if (cachedCart) {
+  //           console.log('Serving from cache');
+  //           const { items, itemsCount } = JSON.parse(cachedCart);
+  //           console.log("coming")
+  //           return res.status(200).json({ message: "added to cart", items, itemsCount });
+  //         }
+  //       } else {
+  //         console.log('Redis not connected, skipping cache');
+  //       }
+  //     } catch (redisErr) {
+  //       console.error('Redis error:', redisErr.message);
+  //       // Continue to database query if Redis fails
+  //     }
+
+  //     // Query database if cache miss or Redis unavailable
+  //     console.log("No")
+  //     const doc = await UserDoc.findOne({ email: userEmail });
+  //     const arr = [];
+  //     for (let i = 0; i < doc.cart.length; i++) {
+  //       const id = doc.cart[i]._id;
+  //       const noo = await MedicineModel.findById(id);
+  //       const foundItemCount = noo.count;
+  //       arr.push(foundItemCount);
+  //     }
+
+  //     // Store in Redis only if connected
+  //     if (redisClient.isOpen) {
+  //       try {
+  //         const cacheData = JSON.stringify({ items: doc.cart, itemsCount: arr });
+  //         await redisClient.setEx(cacheKey, 3600, cacheData); // Cache for 1 hour
+  //         console.log('Cached cart in Redis');
+  //       } catch (redisErr) {
+  //         console.error('Failed to cache in Redis:', redisErr.message);
+  //       }
+  //     }
+
+  //     res.status(200).json({ message: "added to cart", items: doc.cart, itemsCount: arr });
+  //   });
+  // } catch (err) {
+  //   console.error('Server error:', err);
+  //   res.status(500).json({ message: "Internal Server Error" });
+  // }
+
+
+  
     
-    try {
-        const token = req.cookies.token;
+    // try {
+    //     const token = req.cookies.token;
 
-        jwt.verify(token, secret, {}, async(err, data) => {
-            if(err) {
+    //     jwt.verify(token, secret, {}, async(err, data) => {
+    //         if(err) {
                 
-                return res.status(401).json({ message: "Session has expired. Login in." });
-            }
-            const userEmail = data.email;
-            const doc = await UserDoc.findOne({email: userEmail});
-            const arr = [];
-            // console.log(doc.cart)
-            for(let i = 0; i < doc.cart.length; i++) {
-                const id  = doc.cart[i]._id;
-                console.log(id);
-                const noo = await MedicineModel.findById(id);
-                console.log(noo);
-                const foundItemCount = noo.count
-                arr.push(foundItemCount);
-            }
-            // console.log(arr)
-            // console.log(doc.cart)
-            res.status(200).json({message: "added to cart", items: doc.cart, itemsCount: arr});
-        })
-    }
+    //             return res.status(401).json({ message: "Session has expired. Login in." });
+    //         }
+    //         const userEmail = data.email;
+    //         const doc = await UserDoc.findOne({email: userEmail});
+    //         const arr = [];
+    //         // console.log(doc.cart)
+    //         for(let i = 0; i < doc.cart.length; i++) {
+    //             const id  = doc.cart[i]._id;
+    //             console.log(id);
+    //             const noo = await MedicineModel.findById(id);
+    //             console.log(noo);
+    //             const foundItemCount = noo.count
+    //             arr.push(foundItemCount);
+    //         }
+    //         // console.log(arr)
+    //         // console.log(doc.cart)
+    //         res.status(200).json({message: "added to cart", items: doc.cart, itemsCount: arr});
+    //     })
+    // }
 
-    catch(err) {
-        console.log(err);
-        res.status(500).json({message: "Internal Server Error"})
-    }
+    // catch(err) {
+    //     console.log(err);
+    //     res.status(500).json({message: "Internal Server Error"})
+    // }
 })
 
 app.get('/inventory', async (req, res) => {
@@ -1037,15 +1436,444 @@ app.get('/topDeals', async(req, res) => {
 
 
 
+app.get('/test-performance', async (req, res) => {
+  try {
+      // Test simple index (name)
+      console.time('Without Index');
+      const resultWithoutIndex = await MedicineModel.find({ 
+          name: 'Test Medicine' 
+      }).explain('executionStats');
+      console.timeEnd('Without Index');
+      
+      console.time('With Index');
+      const resultWithIndex = await MedicineModel.find({ 
+          name: 'Test Medicine' 
+      }).hint({ name: 1 }).explain('executionStats');
+      console.timeEnd('With Index');
+      
+      // Test compound index (category + price)
+      console.time('Compound Query');
+      const compoundResult = await MedicineModel.find({ 
+          category: 'Pain Relief',
+          price: { $lt: 1000 }
+      }).hint({ category: 1, price: 1 }).explain('executionStats');
+      console.timeEnd('Compound Query');
+      
+      res.json({
+          withoutIndex: resultWithoutIndex.executionStats.executionTimeMillis,
+          withIndex: resultWithIndex.executionStats.executionTimeMillis,
+          compoundQuery: compoundResult.executionStats.executionTimeMillis
+      });
+  } catch (error) {
+      console.error('Performance test error:', error);
+      res.status(500).json({ error: error.message });
+  }
+});
+
+// Add this route for detailed index testing
+app.get('/check-indexes', async (req, res) => {
+  try {
+      // 1. Test medicine search by name
+      console.log('\n1. Testing Medicine Search:');
+      console.time('Medicine Search');
+      const medicineSearch = await MedicineModel.find({ 
+          name: { $regex: 'para', $options: 'i' } 
+      }).explain('executionStats');
+      console.timeEnd('Medicine Search');
+      
+      console.log(`Documents examined: ${medicineSearch.executionStats.totalDocsExamined}`);
+      console.log(`Execution time: ${medicineSearch.executionStats.executionTimeMillis}ms`);
+
+      // 2. Test user lookup by email (unique index)
+      console.log('\n2. Testing User Email Lookup:');
+      console.time('User Lookup');
+      const userLookup = await UserDoc.findOne({ 
+          email: 'test@example.com' 
+      }).explain('executionStats');
+      console.timeEnd('User Lookup');
+      console.log(`Documents examined: ${userLookup.executionStats.totalDocsExamined}`);
+      console.log(`Execution time: ${userLookup.executionStats.executionTimeMillis}ms`);
+
+      // 3. Test category + price compound index
+      console.log('\n3. Testing Category + Price Filter:');
+      console.time('Category Price Filter');
+      const categoryPrice = await MedicineModel.find({ 
+          category: 'Pain Relief',
+          price: { $lt: 1000 }
+      }).explain('executionStats');
+      console.timeEnd('Category Price Filter');
+      console.log(`Documents examined: ${categoryPrice.executionStats.totalDocsExamined}`);
+      console.log(`Execution time: ${categoryPrice.executionStats.executionTimeMillis}ms`);
+
+      // Get a sample user ID for order lookup
+      const sampleUser = await UserDoc.findOne({});
+      const userId = sampleUser ? sampleUser._id : new mongoose.Types.ObjectId();
+
+      // 4. Test order lookup with proper ObjectId
+      console.time('Order Lookup');
+      const orderLookup = await OrderModel.find({
+          userId: userId,
+          orderStatus: 'Current'
+      }).explain('executionStats');
+      console.timeEnd('Order Lookup');
+      console.log(`Documents examined: ${orderLookup.executionStats.totalDocsExamined}`);
+      console.log(`Execution time: ${orderLookup.executionStats.executionTimeMillis}ms`);
+
+      // Return all stats
+      res.json({
+          medicineSearch: {
+              timeMs: medicineSearch.executionStats.executionTimeMillis,
+              docsExamined: medicineSearch.executionStats.totalDocsExamined,
+              indexUsed: medicineSearch.queryPlanner.winningPlan.inputStage?.indexName || 'None'
+          },
+          userLookup: {
+              timeMs: userLookup.executionStats.executionTimeMillis,
+              docsExamined: userLookup.executionStats.totalDocsExamined,
+              indexUsed: userLookup.queryPlanner.winningPlan.inputStage?.indexName || 'None'
+          },
+          categoryPrice: {
+              timeMs: categoryPrice.executionStats.executionTimeMillis,
+              docsExamined: categoryPrice.executionStats.totalDocsExamined,
+              indexUsed: categoryPrice.queryPlanner.winningPlan.inputStage?.indexName || 'None'
+          },
+          orderLookup: {
+              timeMs: orderLookup.executionStats.executionTimeMillis,
+              docsExamined: orderLookup.executionStats.totalDocsExamined,
+              indexUsed: orderLookup.queryPlanner.winningPlan.inputStage?.indexName || 'None',
+              userId: userId.toString()
+          }
+      });
+
+  } catch (error) {
+      console.error('Index test error:', error);
+      res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/test-db-performance', async (req, res) => {
+  try {
+      // 1. Test exact match (should be fastest)
+      console.time('Exact Match');
+      const exactMatch = await MedicineModel.find({ 
+          name: 'Paracetamol'
+      }).explain('executionStats');
+      console.timeEnd('Exact Match');
+
+      // 2. Test regex search with index
+      console.time('Regex Search (Indexed)');
+      const regexSearch = await MedicineModel.find({ 
+          name: { $regex: 'para', $options: 'i' }
+      }).hint({ name: 1 }).explain('executionStats');
+      console.timeEnd('Regex Search (Indexed)');
+
+      // 3. Test regex search without index (force collection scan)
+      console.time('Regex Search (No Index)');
+      const noIndexSearch = await MedicineModel.find({ 
+          name: { $regex: 'para', $options: 'i' }
+      }).hint({ $natural: 1 }).explain('executionStats');
+      console.timeEnd('Regex Search (No Index)');
+
+      // 4. Test compound index (category + price)
+      console.time('Compound Query');
+      const compoundQuery = await MedicineModel.find({ 
+          category: 'Pain Relief',
+          price: { $lt: 1000 }
+      }).hint({ category: 1, price: 1 }).explain('executionStats');
+      console.timeEnd('Compound Query');
+
+      // Get index information
+      const indexes = await MedicineModel.collection.getIndexes();
+
+      res.json({
+          exactMatch: {
+              executionTimeMs: exactMatch.executionStats.executionTimeMillis,
+              docsExamined: exactMatch.executionStats.totalDocsExamined,
+              docsReturned: exactMatch.executionStats.nReturned,
+              indexUsed: exactMatch.queryPlanner.winningPlan.inputStage?.indexName || 'None'
+          },
+          regexWithIndex: {
+              executionTimeMs: regexSearch.executionStats.executionTimeMillis,
+              docsExamined: regexSearch.executionStats.totalDocsExamined,
+              docsReturned: regexSearch.executionStats.nReturned,
+              indexUsed: regexSearch.queryPlanner.winningPlan.inputStage?.indexName || 'None'
+          },
+          regexNoIndex: {
+              executionTimeMs: noIndexSearch.executionStats.executionTimeMillis,
+              docsExamined: noIndexSearch.executionStats.totalDocsExamined,
+              docsReturned: noIndexSearch.executionStats.nReturned,
+              indexUsed: 'None (forced collection scan)'
+          },
+          compoundQuery: {
+              executionTimeMs: compoundQuery.executionStats.executionTimeMillis,
+              docsExamined: compoundQuery.executionStats.totalDocsExamined,
+              docsReturned: compoundQuery.executionStats.nReturned,
+              indexUsed: compoundQuery.queryPlanner.winningPlan.inputStage?.indexName || 'None'
+          },
+          availableIndexes: indexes
+      });
+
+  } catch (error) {
+      console.error('Performance test error:', error);
+      res.status(500).json({ error: error.message });
+  }
+});
 
 
+// Add comprehensive performance test route
+app.get('/test-all-performance', async (req, res) => {
+  try {
+      const results = {
+          medicine: {},
+          orders: {},
+          users: {}
+      };
 
+      // 1. Test Medicine Queries
+      console.log('\n1. Testing Medicine Queries:');
+      
+      // 1.1 Name search
+      console.time('Medicine Name Search');
+      const nameSearch = await MedicineModel.find({ 
+          name: { $regex: 'para', $options: 'i' } 
+      }).explain('executionStats');
+      console.timeEnd('Medicine Name Search');
+      
+      // 1.2 Category + Price
+      console.time('Category Price Filter');
+      const categoryPrice = await MedicineModel.find({
+          category: 'Pain Relief',
+          price: { $lt: 1000 }
+      }).explain('executionStats');
+      console.timeEnd('Category Price Filter');
 
+      // 2. Test Order Queries
+      console.log('\n2. Testing Order Queries:');
+      
+      // Get a sample user
+      const sampleUser = await UserDoc.findOne({});
+      const userId = sampleUser ? sampleUser._id : new mongoose.Types.ObjectId();
 
+      // 2.1 Current Orders
+      console.time('Current Orders');
+      const currentOrders = await OrderModel.find({
+          userId: userId,
+          orderStatus: 'Current'
+      }).explain('executionStats');
+      console.timeEnd('Current Orders');
 
+      // 2.2 Order History
+      console.time('Order History');
+      const orderHistory = await OrderModel.find({
+          userId: userId
+      }).sort({ createdAt: -1 }).explain('executionStats');
+      console.timeEnd('Order History');
 
+      // 3. Test User Queries
+      console.log('\n3. Testing User Queries:');
+      
+      // 3.1 Email Lookup
+      console.time('Email Lookup');
+      const emailLookup = await UserDoc.findOne({
+          email: 'test@example.com'
+      }).explain('executionStats');
+      console.timeEnd('Email Lookup');
 
+      // Compile results
+      results.medicine = {
+          nameSearch: {
+              timeMs: nameSearch.executionStats.executionTimeMillis,
+              docsExamined: nameSearch.executionStats.totalDocsExamined,
+              indexUsed: nameSearch.queryPlanner.winningPlan.inputStage?.indexName || 'COLLSCAN'
+          },
+          categoryPrice: {
+              timeMs: categoryPrice.executionStats.executionTimeMillis,
+              docsExamined: categoryPrice.executionStats.totalDocsExamined,
+              indexUsed: categoryPrice.queryPlanner.winningPlan.inputStage?.indexName || 'COLLSCAN'
+          }
+      };
 
+      results.orders = {
+          currentOrders: {
+              timeMs: currentOrders.executionStats.executionTimeMillis,
+              docsExamined: currentOrders.executionStats.totalDocsExamined,
+              indexUsed: currentOrders.queryPlanner.winningPlan.inputStage?.indexName || 'COLLSCAN'
+          },
+          orderHistory: {
+              timeMs: orderHistory.executionStats.executionTimeMillis,
+              docsExamined: orderHistory.executionStats.totalDocsExamined,
+              indexUsed: orderHistory.queryPlanner.winningPlan.inputStage?.indexName || 'COLLSCAN'
+          }
+      };
+
+      results.users = {
+          emailLookup: {
+              timeMs: emailLookup.executionStats.executionTimeMillis,
+              docsExamined: emailLookup.executionStats.totalDocsExamined,
+              indexUsed: emailLookup.queryPlanner.winningPlan.inputStage?.indexName || 'COLLSCAN'
+          }
+      };
+
+      // Get all indexes
+      const medicineIndexes = await MedicineModel.collection.getIndexes();
+      const orderIndexes = await OrderModel.collection.getIndexes();
+      const userIndexes = await UserDoc.collection.getIndexes();
+
+      results.indexes = {
+          medicine: medicineIndexes,
+          orders: orderIndexes,
+          users: userIndexes
+      };
+
+      res.json(results);
+
+  } catch (error) {
+      console.error('Performance test error:', error);
+      res.status(500).json({ error: error.message });
+  }
+});
+
+// Add clear performance test route
+app.get('/compare-index-performance', async (req, res) => {
+try {
+  const results = [];
+
+  // Choose the correct index name from getIndexes()
+  const indexName = 'name_1'; // Replace this if needed with 'name_optimized' or another exact index name
+
+  // Run each test multiple times to get accurate measurements
+  for (let i = 0; i < 5; i++) {
+    // 1. Test without any index (force collection scan)
+    const startNoIndex = process.hrtime();
+    const noIndexResult = await MedicineModel.find({
+      name: { $regex: 'para', $options: 'i' }
+    }).hint({ $natural: 1 });
+    const noIndexTime = process.hrtime(startNoIndex);
+
+    // 2. Test with specific index name
+    const startWithIndex = process.hrtime();
+    const withIndexResult = await MedicineModel.find({
+      name: { $regex: 'para', $options: 'i' }
+    }).hint(indexName);
+    const withIndexTime = process.hrtime(startWithIndex);
+
+    results.push({
+      iteration: i + 1,
+      noIndex: {
+        timeMs: (noIndexTime[0] * 1000 + noIndexTime[1] / 1e6).toFixed(3),
+        results: noIndexResult.length
+      },
+      withIndex: {
+        timeMs: (withIndexTime[0] * 1000 + withIndexTime[1] / 1e6).toFixed(3),
+        results: withIndexResult.length
+      }
+    });
+  }
+
+  // Get execution stats for detailed analysis
+  const stats = {
+    withoutIndex: await MedicineModel.find({
+      name: { $regex: 'para', $options: 'i' }
+    }).hint({ $natural: 1 }).explain('executionStats'),
+
+    withIndex: await MedicineModel.find({
+      name: { $regex: 'para', $options: 'i' }
+    }).hint(indexName).explain('executionStats')
+  };
+
+  // Calculate averages
+  const averages = {
+    noIndex: {
+      timeMs: (
+        results.reduce((sum, r) => sum + parseFloat(r.noIndex.timeMs), 0) /
+        results.length
+      ).toFixed(3),
+      documentsExamined: stats.withoutIndex.executionStats.totalDocsExamined,
+      documentsReturned: stats.withoutIndex.executionStats.nReturned
+    },
+    withIndex: {
+      timeMs: (
+        results.reduce((sum, r) => sum + parseFloat(r.withIndex.timeMs), 0) /
+        results.length
+      ).toFixed(3),
+      documentsExamined: stats.withIndex.executionStats.totalDocsExamined,
+      documentsReturned: stats.withIndex.executionStats.nReturned
+    }
+  };
+
+  res.json({
+    message: '⚠️ Note: Network latency is NOT included in these times',
+    individualRuns: results,
+    averagePerformance: averages,
+    improvement: {
+      timeImprovement:
+        (
+          ((parseFloat(averages.noIndex.timeMs) -
+            parseFloat(averages.withIndex.timeMs)) /
+            parseFloat(averages.noIndex.timeMs)) *
+          100
+        ).toFixed(2) + '%',
+      documentsExamined: {
+        before: averages.noIndex.documentsExamined,
+        after: averages.withIndex.documentsExamined,
+        reduction:
+          (
+            ((averages.noIndex.documentsExamined -
+              averages.withIndex.documentsExamined) /
+              averages.noIndex.documentsExamined) *
+            100
+          ).toFixed(2) + '%'
+      }
+    }
+  });
+
+} catch (error) {
+  console.error('Performance comparison error:', error);
+  res.status(500).json({ error: error.message });
+}
+});
+
+// Query Planning Analysis Route
+app.get('/api/analyze-queries', async (req, res) => {
+  try {
+      // 1. Simple find query plan
+      const basicQueryPlan = await MedicineModel.find({ category: 'Pain Relief' })
+          .explain('executionStats');
+
+      // 2. Complex query plan with sorting and filtering
+      const complexQueryPlan = await MedicineModel.find({
+          price: { $lt: 1000 },
+          stock: { $gt: 0 }
+      })
+          .sort({ price: -1 })
+          .explain('executionStats');
+
+      // 3. Text search query plan
+      const searchQueryPlan = await MedicineModel.find({
+          $text: { $search: "paracetamol" }
+      })
+          .explain('executionStats');
+
+      res.json({
+          basicQueryPlan: {
+              executionTimeMillis: basicQueryPlan.executionStats.executionTimeMillis,
+              totalDocsExamined: basicQueryPlan.executionStats.totalDocsExamined,
+              indexesUsed: basicQueryPlan.queryPlanner.winningPlan.inputStage?.indexName || 'COLLSCAN'
+          },
+          complexQueryPlan: {
+              executionTimeMillis: complexQueryPlan.executionStats.executionTimeMillis,
+              totalDocsExamined: complexQueryPlan.executionStats.totalDocsExamined,
+              indexesUsed: complexQueryPlan.queryPlanner.winningPlan.inputStage?.indexName || 'COLLSCAN'
+          },
+          searchQueryPlan: {
+              executionTimeMillis: searchQueryPlan.executionStats.executionTimeMillis,
+              totalDocsExamined: searchQueryPlan.executionStats.totalDocsExamined,
+              indexesUsed: searchQueryPlan.queryPlanner.winningPlan.inputStage?.indexName || 'COLLSCAN'
+          }
+      });
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+});
 
 
 

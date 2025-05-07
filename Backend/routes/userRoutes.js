@@ -1,5 +1,5 @@
 const { userInfo, userLogin, userRegister, userLogout } = require('../controllers/userController.js');
-const  { sellerInfo, sellerLogin, sellerSignup } = require('../controllers/sellerController.js')
+const  { sellerInfo, sellerLogin, sellerSignup, sendRevenue } = require('../controllers/sellerController.js')
 
 const express = require('express');
 const router = express.Router();
@@ -14,6 +14,7 @@ router.get('/logout', userLogout)
 router.post('/sellerSignup', sellerSignup)
 router.post('/sellerLogin', sellerLogin)
 router.get('/seller-info', sellerInfo)
+router.get('/sellerRevenue', sendRevenue)
 
 
 
