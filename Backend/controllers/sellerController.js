@@ -95,6 +95,8 @@ const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const secret = 'thisissecret'
 
+const isProd = process.env.NODE_ENV === 'production';
+
 const sellerSignup = async (req, res) => {
     const {email, shopName, password, location, gstin } = req.body;
     try {
@@ -121,8 +123,8 @@ const sellerLogin = async (req, res) => {
             }
             res.cookie('token1', token, {
                 httpOnly: true,
-                secure: false,
-                sameSite: 'Lax',
+                secure: isProd,
+                sameSite: isProd ? 'None' : 'Lax',
                 maxAge: 10 * 60 * 1000
             });
             return res.status(200).json({message: "Succesfully Created", seller: isExistSeller })

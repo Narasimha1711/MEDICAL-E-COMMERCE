@@ -24,6 +24,7 @@ const redisClient = require('./config/redis.js');
 // Seller-to-Seller B2B API Router
 const sellerToSellerRoutes = require('./routes/sellerToSellerRoutes');
 const chalk = require('chalk');
+const Post = require('./models/Post.js')
 
 //f
 

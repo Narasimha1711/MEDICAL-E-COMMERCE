@@ -479,8 +479,8 @@ app.get('/inventory', async (req, res) => {
 app.post('/sellerLogout', (req, res) => {
     res.cookie('token', '', { 
         httpOnly: true, 
-        secure: false,  // Set to true in production if using HTTPS
-        sameSite: 'Lax', 
+        secure: isProd,
+        sameSite: isProd ? 'None' : 'Lax',
         maxAge: 0       // Expire the cookie immediately
     });
     return res.status(200).json({message: "Successfully logged out"});
