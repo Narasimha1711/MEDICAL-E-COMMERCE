@@ -6,6 +6,7 @@ import NotificationToast from '../Components/NotificationToast';
 import { toast } from 'react-toastify';
 import { clearCart, getCartCount } from '../app/userSlice';
 import { useDispatch } from 'react-redux';
+import { API_BASE_URL } from '../config';
 
 
 
@@ -219,7 +220,7 @@ function CartPage() {
                   <div key={item._id} className="flex items-center p-6 hover:bg-gray-50">
                     <img 
                       // src={item.image} 
-                      src={`${import.meta.env.VITE_API_BASE_URL}/uploads/${item.image}`} 
+                      src={`${API_BASE_URL}/uploads/${item.image}`} 
                       alt={item.name} 
                       className="w-20 h-20 object-cover rounded"
                     />
