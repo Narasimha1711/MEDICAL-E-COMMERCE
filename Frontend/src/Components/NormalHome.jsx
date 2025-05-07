@@ -220,9 +220,9 @@ const NormalHome = () => {
 
 export default NormalHome
 
-// App.test.js or test file
-beforeAll(() => {
-  jest.spyOn(console, 'warn').mockImplementation(() => {}); // Suppress React Router warnings
-});
+// // App.test.js or test file
+// beforeAll(() => {
+//   jest.spyOn(console, 'warn').mockImplementation(() => {}); // Suppress React Router warnings
+// });
 
 
