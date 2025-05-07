@@ -26,8 +26,8 @@ const sellerToSellerRoutes = require('./routes/sellerToSellerRoutes');
 const chalk = require('chalk');
 
 //f
-const isProd = process.env.NODE_ENV === 'production';
 
+const isProd = process.env.NODE_ENV === 'production';
 
 // Angolia Search 
 
