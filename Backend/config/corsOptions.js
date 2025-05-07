@@ -10,7 +10,8 @@
 
 const allowedOrigins = [
     'http://localhost:5173',
-    // 'https://medical-e-commerce.vercel.app'
+    // 'https://medical-e-commerce.vercel.app',
+    'https://medical-e-commerce-45wy.vercel.app'
       
   ];
   
