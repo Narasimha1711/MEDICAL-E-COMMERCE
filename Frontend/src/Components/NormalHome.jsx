@@ -39,6 +39,24 @@ const NormalHome = () => {
     } 
   }, [items1])
 
+  useEffect(() => {
+    if (items && items.currentItems && items.currentItems.length > 0) {
+      console.log("Current Orders", items.currentItems);
+      setOrders(items.currentItems);
+    } else {
+      console.log("No current orders found");
+    }
+  }, [items]);
+  
+  useEffect(() => {
+    if (items1 && items1.items && items1.items.length > 0) {
+      console.log("Top Deals", items1.items);
+      setOrders1(items1.items);
+    } else {
+      console.log("No top deals found");
+    }
+  }, [items1]);
+
 
   return (
     
@@ -201,3 +219,10 @@ const NormalHome = () => {
 }
 
 export default NormalHome
+
+// App.test.js or test file
+beforeAll(() => {
+  jest.spyOn(console, 'warn').mockImplementation(() => {}); // Suppress React Router warnings
+});
+
+

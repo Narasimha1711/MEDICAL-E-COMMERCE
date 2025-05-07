@@ -1,92 +1,44 @@
-// app.tests.js
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { BrowserRouter } from 'react-router-dom';
-import Home from './pages/Home';
-import NormalHome from './components/NormalHome';
-const { useUserHomeCurrentOrdersQuery, useUserHomeTopDealsQuery } = require('./app/addCartSlice');
-//Mock test
-// Mock apiSlice
-jest.mock('./app/apiSlice', () => {
-  const mockApiSlice = {
-    reducerPath: 'api',
-    reducer: jest.fn((state = {}) => state),
-    middleware: () => (next) => (action) => next(action),
-    injectEndpoints: jest.fn(() => ({
-      useAddToCartMutation: jest.fn(() => [jest.fn(), { isLoading: false }]),
-    })),
-  };
-  return {
-    apiSlice: mockApiSlice,
-    useUserHomeCurrentOrdersQuery: jest.fn(),
-    useUserHomeTopDealsQuery: jest.fn(),
-  };
-});
+import NormalHome from './Components/NormalHome';
+import { useUserHomeCurrentOrdersQuery, useUserHomeTopDealsQuery } from './app/addCartSlice';
 
+// Mock the RTK Query hooks to return mock data
 jest.mock('./app/addCartSlice', () => ({
-    ...jest.requireActual('./app/addCartSlice'),
-    useUserHomeCurrentOrdersQuery: jest.fn(),
-    useUserHomeTopDealsQuery: jest.fn(),
-  }));
+  useUserHomeCurrentOrdersQuery: jest.fn(),
+  useUserHomeTopDealsQuery: jest.fn(),
+}));
 
-  // Mock data for testing
+// Mock data for testing
 const mockCurrentOrders = {
-    data: { currentItems: [] }, // Mock data for current orders
-    error: null,
-    isLoading: false,
-    isError: false,
-  };
-  
-  const mockTopDeals = {
-    data: { items: [] }, // Mock data for top deals
-    isLoading: false,
-  };
-
-  useUserHomeCurrentOrdersQuery.mockReturnValue(mockCurrentOrders);
-    useUserHomeTopDealsQuery.mockReturnValue(mockTopDeals);
-
-    // Set up a mock store for Redux
-const mockStore = configureStore({
-    reducer: {
-      searchQuery: (state = { searchQuery: '' }) => state, // Mock reducer for search query
-      api: (state = {}) => state, // Mock the api reducer
-    },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
-  });
-  
-  
-  
-  
-  // Mock data for testing
-  useUserHomeCurrentOrdersQuery.mockReturnValue({
-    data: { currentItems: [] }, // Return mock data
-    error: null,
-    isLoading: false,
-    isError: false,
-  });
-  
-  useUserHomeTopDealsQuery.mockReturnValue({
-    data: { items: [] },
-    isLoading: false,
-  });
-  
-
-
-
-useUserHomeCurrentOrdersQuery.mockReturnValue({
-  data: [],
+  data: { currentItems: [] }, // Mock data for current orders
   error: null,
   isLoading: false,
   isError: false,
-});
-useUserHomeTopDealsQuery.mockReturnValue({
-  data: [],
+};
+
+const mockTopDeals = {
+  data: { items: [] }, // Mock data for top deals
   isLoading: false,
+};
+
+// Mock API hooks to return the above mock data
+useUserHomeCurrentOrdersQuery.mockReturnValue(mockCurrentOrders);
+useUserHomeTopDealsQuery.mockReturnValue(mockTopDeals);
+
+// Set up mock Redux store
+const mockStore = configureStore({
+  reducer: {
+    searchQuery: (state = { searchQuery: '' }) => state, // Mock reducer for search query
+    api: (state = {}) => state, // Mock the api reducer
+  },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
 });
 
-
+// Mock context for SearchContextCreate (if you're using it in the component)
 const SearchContextCreate = React.createContext({
   searchItems: [],
   setSearchItems: jest.fn(),
@@ -94,25 +46,26 @@ const SearchContextCreate = React.createContext({
   setSearchItem: jest.fn(),
 });
 
+// Test case to check if "Shop Now" text exists
 test('renders NormalHome with Shop Now text', () => {
-    render(
-      <Provider store={mockStore}>
-        <SearchContextCreate.Provider value={{
-          searchItems: [],
-          setSearchItems: jest.fn(),
-          searchItem: '',
-          setSearchItem: jest.fn(),
-        }}>
-          <BrowserRouter>
-            <NormalHome /> {/* Ensure you're rendering the correct component */}
-          </BrowserRouter>
-        </SearchContextCreate.Provider>
-      </Provider>
-    );
-  
-    // Check if "Shop Now" text is in the document
-    expect(screen.getByText(/Shop Now/i)).toBeInTheDocument();
-  });
+  render(
+    <Provider store={mockStore}>
+      <SearchContextCreate.Provider value={{
+        searchItems: [],
+        setSearchItems: jest.fn(),
+        searchItem: '',
+        setSearchItem: jest.fn(),
+      }}>
+        <BrowserRouter>
+          <NormalHome />
+        </BrowserRouter>
+      </SearchContextCreate.Provider>
+    </Provider>
+  );
+
+  // Check if "Shop Now" text is in the document (make sure it's rendered properly)
+  expect(screen.getByText(/Shop Now/i)).toBeInTheDocument();
+});
 
 // import React from 'react';
 // import { render, screen } from '@testing-library/react';
