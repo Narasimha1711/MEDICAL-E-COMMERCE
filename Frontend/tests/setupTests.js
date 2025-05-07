@@ -10,7 +10,7 @@ fetchMock.mockResponse(JSON.stringify({}));
 globalThis.import = {
   meta: {
     env: {
-        VITE_API_BASE_URL: 'https://medical-e-commerce-41jw.vercel.app', // Mocked API base URL for tests
+    //   VITE_API_BASE_URL: 'https://medical-e-commerce-41jw.vercel.app', // Consistent URL for tests
     },
   },
 };

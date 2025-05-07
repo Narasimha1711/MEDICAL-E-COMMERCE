@@ -11,7 +11,7 @@ const OrdersSection = ({ orders }) => {
         <Link to='/userDashboard/orders'><button className="text-blue-600 hover:text-blue-700">View All Orders</button></Link>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {orders.map((order) => (
+        {orders?.map((order) => (
           <OrderCard key={order._id} order={order} />
         ))}
       </div>

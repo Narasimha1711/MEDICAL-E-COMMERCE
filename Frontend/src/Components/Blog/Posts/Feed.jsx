@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import PostCard from './PostCard';
-import { getPosts } from '../services/postService';
+import axios from 'axios';
 
 const Feed = () => {
   const [posts, setPosts] = useState([]);
@@ -9,8 +9,9 @@ const Feed = () => {
   useEffect(() => {
     const loadPosts = async () => {
       try {
-        const data = await getPosts();
-        setPosts(data);
+        const data = await axios.get('http://localhost:9001/posts');
+        console.log(data);
+        setPosts(data.data);
       } catch (error) {
         console.error('Error loading posts:', error);
       } finally {
@@ -33,7 +34,7 @@ const Feed = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <PostCard key={post._id} post={post} />
         ))}
       </div>
     </div>

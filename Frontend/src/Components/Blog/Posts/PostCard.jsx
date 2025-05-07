@@ -4,6 +4,43 @@ import { FiHeart, FiMessageSquare, FiShare2 } from 'react-icons/fi';
 const PostCard = ({ post }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [comments, setComments] = useState(post.comments || []);
+  const [likes, setLikes] = useState(post.likes || 0);
+
+  const handleLike = async () => {
+    try {
+      const response = await fetch(`http://localhost:9001/api/posts/${post._id}/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+      setLikes(data.likes);
+      setIsLiked(true);
+    } catch (error) {
+      console.error('Error liking post:', error);
+    }
+  };
+
+  const handleComment = async (comment) => {
+    try {
+      const response = await fetch(`http://localhost:9001/api/posts/${post._id}/comment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          author: comment.author,
+          content: comment.content
+        })
+      });
+      const data = await response.json();
+      setComments(data.comments);
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+  };
 
   const truncateText = (text, maxLength) => {
     if (text.length <= maxLength) return text;
@@ -54,43 +91,8 @@ const PostCard = ({ post }) => {
           ))}
         </div>
 
-        <div className="flex justify-between items-center border-t pt-4">
-          <button
-            onClick={() => setIsLiked(!isLiked)}
-            className={`flex items-center space-x-2 px-3 py-1 rounded-full transition-colors duration-200
-                       ${isLiked 
-                         ? 'text-red-500 bg-red-50' 
-                         : 'text-gray-500 hover:bg-gray-50'}`}
-          >
-            <FiHeart className={isLiked ? 'fill-current' : ''} />
-            <span>{post.likes + (isLiked ? 1 : 0)}</span>
-          </button>
-
-          <button
-            onClick={() => setShowComments(!showComments)}
-            className="flex items-center space-x-2 px-3 py-1 rounded-full text-gray-500 hover:bg-gray-50 transition-colors duration-200"
-          >
-            <FiMessageSquare />
-            <span>{post.comments.length}</span>
-          </button>
-
-          <button
-            className="flex items-center space-x-2 px-3 py-1 rounded-full text-gray-500 hover:bg-gray-50 transition-colors duration-200"
-          >
-            <FiShare2 />
-          </button>
-        </div>
-
-        {showComments && (
-          <div className="mt-4 space-y-3 border-t pt-4">
-            {post.comments.map((comment) => (
-              <div key={comment.id} className="bg-gray-50 rounded-lg p-3">
-                <p className="font-medium text-gray-900">{comment.author}</p>
-                <p className="text-gray-600 mt-1">{comment.content}</p>
-              </div>
-            ))}
-          </div>
-        )}
+      
+        
       </div>
     </div>
   );

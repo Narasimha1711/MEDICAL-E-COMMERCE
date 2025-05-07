@@ -33,6 +33,7 @@ export default function SellerLogin() {
 
       const data = await response.json();
       setSellerData(data.seller);
+      localStorage.setItem("sellerData", JSON.stringify(data.seller));
       navigate('/dashboard');
     } catch (err) {
       console.log(err);

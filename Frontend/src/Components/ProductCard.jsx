@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getCartCount } from '../app/userSlice';
-
+import { API_BASE_URL } from '../config';
 // const ProductCard = ({ product, userLocation, addToCart, distance }) => {
 const ProductCard = ({ product }) => {
 
@@ -130,7 +130,7 @@ const ProductCard = ({ product }) => {
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
       <div className="relative">
         <img 
-          src={`${import.meta.env.VITE_API_BASE_URL}/uploads/${product.image}`} 
+          src={`${API_BASE_URL}/uploads/${product.image}`} 
           className="w-full h-48 object-cover" 
           alt={product.name}
         />
