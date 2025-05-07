@@ -2211,6 +2211,29 @@ app.post('/contact', async (req, res) => {
 });
 
 
+app.post('/createPost', async (req, res) => {
+  try {
+      const { title, content, image, author, tags } = req.body;
+      const post = await Post.create({ title, content, image, author, tags });
+      res.status(201).json(post);
+  } catch (error) {
+      console.error('Error creating post:', error);
+      res.status(500).json({ message: 'Failed to create post' });
+  }
+});
+
+app.get('/posts', async (req, res) => {
+  try {
+      const posts = await Post.find();
+      res.status(200).json(posts);
+  } catch (error) {
+      console.error('Error fetching posts:', error);
+      res.status(500).json({ message: 'Failed to fetch posts' });
+  }
+});
+
+
+
 
 module.exports = app;
 
