@@ -1,0 +1,180 @@
+openapi: 3.0.0
+info:
+  title: Medical E-Commerce Backend API
+  version: 1.0.0
+  description: API documentation for the Medical E-Commerce Backend.
+servers:
+  - url: http://localhost:9001
+paths:
+  /login:
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+        '401':
+          description: Invalid credentials
+  /register:
+    post:
+      summary: User registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                username:
+                  type: string
+      responses:
+        '201':
+          description: Registration successful
+        '400':
+          description: Bad request
+  /user-info:
+    get:
+      summary: Get user info
+      responses:
+        '200':
+          description: User info
+  /logout:
+    get:
+      summary: User logout
+      responses:
+        '200':
+          description: Logout successful
+  /sellerSignup:
+    post:
+      summary: Seller registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                shopName:
+                  type: string
+      responses:
+        '201':
+          description: Seller registered
+        '400':
+          description: Bad request
+  /sellerLogin:
+    post:
+      summary: Seller login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Seller login successful
+        '401':
+          description: Invalid credentials
+  /seller-info:
+    get:
+      summary: Get seller info
+      responses:
+        '200':
+          description: Seller info
+  /sellerRevenue:
+    get:
+      summary: Get seller revenue
+      responses:
+        '200':
+          description: Seller revenue
+  /analyze-queries:
+    get:
+      summary: Analyze query performance
+      responses:
+        '200':
+          description: Query analysis result
+  /request:
+    post:
+      summary: Create a seller-to-seller request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sellerId:
+                  type: string
+                type:
+                  type: string
+                medicineName:
+                  type: string
+                quantity:
+                  type: integer
+      responses:
+        '201':
+          description: Request created
+        '400':
+          description: Bad request
+  /seller-medicines/{sellerId}:
+    get:
+      summary: Get all medicines for a seller
+      parameters:
+        - name: sellerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Medicines list
+        '404':
+          description: Seller not found
+  /requests:
+    get:
+      summary: Get all seller-to-seller requests
+      responses:
+        '200':
+          description: List of requests
+  /fulfill:
+    post:
+      summary: Fulfill a seller-to-seller request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reqId:
+                  type: string
+                sellerId:
+                  type: string
+      responses:
+        '200':
+          description: Request fulfilled
+        '400':
+          description: Invalid request

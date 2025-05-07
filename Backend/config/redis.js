@@ -27,8 +27,10 @@
 const redis = require('redis');
 
 const client = redis.createClient({
-  url: 'redis://redis:6379', // Use Docker service name 'redis' instead of 'localhost'
-  socket: {
+  // url: 'redis://redis:6379', // Use Docker service name 'redis' instead of 'localhost'
+  host: 'localhost',
+  port: 6379,
+  socket: { 
     reconnectStrategy: (retries) => {
       if (retries > 5) {
         console.error('Redis: Max retries reached, giving up.');

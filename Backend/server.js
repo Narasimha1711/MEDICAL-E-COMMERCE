@@ -30,6 +30,13 @@ const Post = require('./models/Post.js')
 
 const isProd = process.env.NODE_ENV === 'production';
 
+// require('./swagger')(app);
+
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./swagger.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 // Angolia Search 
 
 // const client = algoliasearch('N7ADFVXWHO', '5c66334238d6abf77f4666de16982a21');
