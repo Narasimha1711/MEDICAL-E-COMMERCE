@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import './sellerheader.css';
+import './sellerHeader.css';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUser } from 'react-icons/fa';
