@@ -1,0 +1,61 @@
+/* sellerList.css */
+
+.sellerList {
+    flex: 3;
+    margin: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .sellerTable {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .sellerTable th,
+  .sellerTable td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    transition: background-color 0.5s ease, color 0.5s ease;
+  }
+
+  .sellerTable tr:hover {
+    background-color : black;
+    color : white;
+  }
+  
+  .sellerTable th {
+    background-color: #f4f4f4;
+  }
+  
+  .sellerListUser {
+    display: flex;
+    align-items: center;
+  }
+  
+  .sellerListEdit {
+    border: none;
+    border-radius: 10px;
+    padding: 5px 10px;
+    background-color: #3bb077;
+    color: white;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .sellerListEdit:hover {
+    background-color: #329b63;
+  }
+  
+  td {
+    padding: 10px;
+  }
+  
+  .sellerListUser img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+  }

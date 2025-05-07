@@ -1,0 +1,74 @@
+.featured {
+    width: 400%;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap; /* Allows items to wrap to the next row */
+    gap: 10px; /* Adds spacing between rows and columns */
+    width: calc(100% - 0px);
+}
+
+.featuredItem {
+    flex: 1;
+    margin: 0px 30px;
+    padding: 30px;
+    border-radius: 10px;
+    cursor: pointer;
+    -webkit-box-shadow: 0px 0px 15px -10px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 15px -10px rgba(0, 0, 0, 0.75);
+    width: calc(70% - 60px);
+    box-sizing: border-box;
+    background-color : white;
+    margin : 10px;
+    text-align : center;
+    transition: background-color 0.5s ease, color 0.5s ease; /* Smooth transition for hover effects */
+}
+
+/* Change the background and text color when hovered */
+.featuredItem:hover {
+    background-color: black; /* Background changes to dark blue */
+    color: white; /* Text changes to white */
+    box-shadow : 0px 2px 2px 5px ;
+}
+
+/* Ensure .featuredSub also changes color when parent is hovered */
+.featuredItem:hover .featuredSub {
+    color: white; /* Changes the sub text to white */
+}
+
+.featuredTitle {
+    font-size: 20px;
+}
+
+.featuredMoneyContainer {
+    margin: 10px 0px;
+    display: flex;
+    justify-content : center;
+    align-items: center;
+}
+
+.featuredMoney {
+    font-size: 30px;
+    font-weight: 600;
+}
+
+.featuredMoneyRate {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+}
+
+.featuredIcon {
+    font-size: 14px;
+    margin-left: 5px;
+    color: darkblue; /* Default color changed to dark blue */
+}
+
+.featuredIcon.negative {
+    color: red;
+}
+
+.featuredSub {
+    font-size: 15px;
+    color: gray; /* Default color is gray */
+    transition: color 0.3s ease; /* Smooth transition for color change */
+}

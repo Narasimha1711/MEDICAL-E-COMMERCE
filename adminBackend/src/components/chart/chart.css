@@ -1,0 +1,17 @@
+.chart {
+  margin: 20px;
+  padding: 20px;
+  -webkit-box-shadow: 0px 0px 15px -10px rgba(0, 0, 0, 0.75);
+  box-shadow: 0px 0px 15px -10px rgba(0, 0, 0, 0.75);
+  background-color : white;
+  border-radius : 10px;
+   transition: background-color 0.5s ease, color 0.5s ease;
+}
+.chart:hover {
+  background-color : black;
+  color : white;
+}
+  
+.chartTitle {
+    margin-bottom: 20px;
+  }
