@@ -38,13 +38,26 @@ The platform supports **real-time availability, location-based search, caching o
 
 ---
 
-## 🏗️ Architecture
+## ⚡ Getting Started
 
-```mermaid
-flowchart TD
-    User[User Browser] -->|HTTP/HTTPS| ReactUI[React + Redux Frontend]
-    ReactUI -->|GraphQL/REST API| Backend[NodeJS + Express Server]
-    Backend -->|Queries| MongoDB[(MongoDB Database)]
-    Backend -->|Caching| Redis[(Redis Cache)]
-    Backend --> Auth[JWT Authentication]
-    Seller[Seller Portal] -->|HTTP/HTTPS| ReactUI
+### 1️⃣ Clone Repository
+```bash
+git clone https://github.com/<your-username>/medical-ecommerce.git
+cd medical-ecommerce
+
+**Setup Backend**
+cd backend
+npm install
+npm run dev
+
+**Setup Frontend**
+cd frontend
+npm install
+npm start
+
+**Access**
+
+Frontend → http://localhost:5173
+
+Backend API → http://localhost:9000
+
