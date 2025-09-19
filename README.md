@@ -1,24 +1,24 @@
-# 🏥 Medical E-commerce Platform
+#  Medical E-commerce Platform
 
 A **full-stack MERN application** that connects **users** and **medical shops (sellers)** for buying and selling medicines.  
 The platform supports **real-time availability, location-based search, caching optimization, and flexible APIs** for a smooth e-commerce experience.  
 
 ---
 
-## 🚀 Features
+##  Features
 
-### 👤 User
+###  User
 - Search medicines by name or category.  
 - Find nearby shops (sorted by distance).  
 - Add medicines to cart and place orders.  
 - View order history.  
 
-### 🛒 Seller
+###  Seller
 - Register and list medicines with details (name, stock, price).  
 - Manage inventory with stock updates.  
 - View and manage customer orders.  
 
-### ⚙️ Technical Features
+###  Technical Features
 - **Redis caching** for frequently accessed queries (response time improved by ~35%).  
 - **GraphQL API** for flexible and efficient data fetching (reduced over-fetching).  
 - **MongoDB indexing** on medicine names & locations (query latency reduced by ~40%).  
@@ -27,7 +27,7 @@ The platform supports **real-time availability, location-based search, caching o
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 - **Frontend:** ReactJS, Redux, TailwindCSS  
 - **Backend:** NodeJS, ExpressJS, GraphQL  
@@ -38,7 +38,7 @@ The platform supports **real-time availability, location-based search, caching o
 
 ---
 
-## ⚡ Getting Started
+## Getting Started
 
 ```bash
 git clone https://github.com/Narasimha1711/MEDICAL-E-COMMERCE.git
@@ -55,8 +55,6 @@ npm install
 npm start
 
 **Access**
-
 Frontend → http://localhost:5173
-
 Backend API → http://localhost:9000
 
