@@ -40,9 +40,8 @@ The platform supports **real-time availability, location-based search, caching o
 
 ## ⚡ Getting Started
 
-### 1️⃣ Clone Repository
 ```bash
-git clone https://github.com/<your-username>/medical-ecommerce.git
+git clone https://github.com/Narasimha1711/MEDICAL-E-COMMERCE.git
 cd medical-ecommerce
 
 **Setup Backend**
